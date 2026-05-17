@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">import React, { useState, useEffect } from 'react';</p>
+<p class="p1">import {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>Home, Package, ShoppingCart, FileText, Settings, Search,<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>Plus, Edit, Trash2, Image as ImageIcon, LogOut, Printer,</p>
+<p class="p1"><span class="Apple-converted-space">  </span>CheckCircle2, Clock, CalendarDays, XCircle, Download, MessageCircle, Bluetooth, Calculator, UserCircle</p>
+<p class="p1">} from 'lucide-react';</p>
+<p class="p2"><br></p>
+<p class="p1">// ==========================================</p>
+<p class="p1">// 🔴 KONFIGURASI PENTING DEVELOPER 🔴</p>
+<p class="p1">// ==========================================</p>
+<p class="p1">const DEV_COMPANY_LOGO = ""; // Kosongkan agar pakai desain KASSQU bawaan, atau isi URL gambar</p>
+<p class="p1">const SPLASH_BG_IMAGE = "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&amp;fit=crop&amp;q=80&amp;w=2000";</p>
+<p class="p1">const LOGIN_BG_IMAGE = "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&amp;fit=crop&amp;q=80&amp;w=2000";</p>
+<p class="p2"><br></p>
+<p class="p1">// PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:</p>
+<p class="p1">const GAS_URL = "https://script.google.com/macros/s/AKfycby_PASTE_KODE_LU_DISINI/exec";<span class="Apple-converted-space"> </span></p>
+<p class="p1">// ==========================================</p>
+<p class="p2"><br></p>
+<p class="p1">const INITIAL_SETTINGS = {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>storeName: 'Laundry Clean &amp; Fresh',</p>
+<p class="p1"><span class="Apple-converted-space">  </span>address: 'Jl. Merdeka No. 123, Jakarta',</p>
+<p class="p1"><span class="Apple-converted-space">  </span>phone: '0812-3456-7890',</p>
+<p class="p1"><span class="Apple-converted-space">  </span>logo: null</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">const INITIAL_PRODUCTS = [</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 1, name: 'Cuci Komplit (Cuci + Setrika)', price: 7000, unit: 'Kg', image: null, category: 'Kiloan' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 2, name: 'Cuci Kering', price: 5000, unit: 'Kg', image: null, category: 'Kiloan' },</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{ id: 4, name: 'Bed Cover Besar', price: 25000, unit: 'Pcs', image: null, category: 'Satuan' }</p>
+<p class="p1">];</p>
+<p class="p2"><br></p>
+<p class="p1">const compressImage = (file) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return new Promise((resolve) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const reader = new FileReader();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>reader.readAsDataURL(file);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>reader.onload = (event) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const img = new Image();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>img.src = event.target.result;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>img.onload = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const canvas = document.createElement('canvas');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const MAX_WIDTH = 600;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const MAX_HEIGHT = 600;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let width = img.width;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let height = img.height;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (width &gt; height &amp;&amp; width &gt; MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>else if (height &gt; MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>canvas.width = width; canvas.height = height;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ctx = canvas.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>ctx.drawImage(img, 0, 0, width, height);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>resolve(canvas.toDataURL('image/jpeg', 0.5));<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">export default function App() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [showSplash, setShowSplash] = useState(true);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [isDbLoading, setIsDbLoading] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [isLoggedIn, setIsLoggedIn] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [currentUser, setCurrentUser] = useState(null); // Menyimpan info kasir yang login</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [activeTab, setActiveTab] = useState('dashboard');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [searchQuery, setSearchQuery] = useState('');</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [settings, setSettings] = useState(INITIAL_SETTINGS);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [products, setProducts] = useState(INITIAL_PRODUCTS);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [transactions, setTransactions] = useState([]);</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [loginError, setLoginError] = useState('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [editingTrx, setEditingTrx] = useState(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const timer = setTimeout(() =&gt; setShowSplash(false), 2000);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return () =&gt; clearTimeout(timer);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const fetchFromGAS = async (payload) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const response = await fetch(GAS_URL, {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>method: 'POST',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body: JSON.stringify(payload)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>console.error("GAS Error:", error);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return { status: 'error', message: error.message };</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleLogin = async (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!GAS_URL.includes('script.google.com')) {</p>
+<p class="p1"><span class="Apple-converted-space">       </span>setLoginError('DEVELOPER: URL Google Apps Script belum diisi di kode!');</p>
+<p class="p1"><span class="Apple-converted-space">       </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const inputUser = e.target.username.value;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const inputPass = e.target.password.value;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>setLoginError('Mengecek kredensial ke server...');</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const res = await fetchFromGAS({ action: 'GET_DATA' });</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (res.status === 'success') {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const staffData = res.data.staff || [];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let validUser = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (staffData.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Cek kecocokan Kode Kasir, PIN, dan Status Aktif</p>
+<p class="p1"><span class="Apple-converted-space">        </span>validUser = staffData.find(s =&gt; s.kodeKasir === inputUser &amp;&amp; s.pin === inputPass &amp;&amp; s.status.toLowerCase() === 'aktif');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Fallback jika tab Staff belum terbentuk</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (inputUser === 'admin' &amp;&amp; inputPass === '123') {</p>
+<p class="p1"><span class="Apple-converted-space">           </span>validUser = { kodeKasir: 'admin', namaKasir: 'Admin Utama', status: 'aktif' };</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (validUser) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setCurrentUser(validUser);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (res.data.settings) setSettings(res.data.settings);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (res.data.products &amp;&amp; res.data.products.length &gt; 0) setProducts(res.data.products);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setTransactions(res.data.transactions || []);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setIsLoggedIn(true);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setLoginError('');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setLoginError('Kode Kasir/PIN salah, atau akun dinonaktifkan!');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setLoginError('Gagal koneksi ke server database.');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const updateSettingsDb = async (newData) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setSettings(newData);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>await fetchFromGAS({ action: 'SAVE_SETTINGS', data: newData });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const saveProductDb = async (prod) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const newProds = products.find(p =&gt; p.id === prod.id)<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>? products.map(p =&gt; p.id === prod.id ? prod : p)<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>: [...products, prod];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setProducts(newProds);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>await fetchFromGAS({ action: 'SAVE_PRODUCT', data: prod });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const deleteProductDb = async (id) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setProducts(products.filter(p =&gt; p.id !== id));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>await fetchFromGAS({ action: 'DELETE_PRODUCT', id: id });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const saveTransactionDb = async (trx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const newTrxs = transactions.find(t =&gt; t.id === trx.id)<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>? transactions.map(t =&gt; t.id === trx.id ? trx : t)<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>: [...transactions, trx];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setTransactions(newTrxs);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>await fetchFromGAS({ action: 'SAVE_TRANSACTION', data: trx });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const deleteTransactionDb = async (id) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setTransactions(transactions.filter(t =&gt; t.id !== id));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>await fetchFromGAS({ action: 'DELETE_TRANSACTION', id: id });</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const formatRupiah = (num) =&gt; new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (showSplash) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="fixed inset-0 z-50 flex flex-col items-center justify-center" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">         </span>&lt;div className="absolute inset-0 bg-gray-900/80 backdrop-blur-md"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">         </span>&lt;div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-12 drop-shadow-md"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex items-center gap-4 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">               </span>{DEV_COMPANY_LOGO ? (</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>&lt;img src={DEV_COMPANY_LOGO} alt="Logo" className="w-16 h-16 object-cover rounded-2xl drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">               </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>&lt;div className="w-[4.5rem] h-[4.5rem] bg-[#5c5cff] rounded-2xl flex items-center justify-center drop-shadow-[0_0_15px_rgba(99,102,241,0.6)]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;Calculator size={40} className="text-white" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">               </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">               </span>&lt;h1 className="text-[3.5rem] leading-none font-black text-white tracking-widest drop-shadow-lg uppercase" style={{ fontFamily: 'Tahoma, sans-serif' }}&gt;KASSQU&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p className="text-gray-200 font-medium text-sm mt-4"&gt;Menyiapkan toko Anda...&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">         </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>if (!isLoggedIn) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/90 backdrop-blur-sm"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="relative z-10 bg-white/20 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="text-center mb-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1 className="text-2xl font-black text-white tracking-wide uppercase"&gt;SISTEM KASIR&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p className="text-gray-200 text-sm mt-1 font-medium"&gt;Masuk untuk melanjutkan&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{loginError &amp;&amp; &lt;div className="mb-4 p-3 bg-red-100/90 text-red-700 rounded-lg text-sm font-bold flex justify-center text-center gap-2 border border-red-200"&gt;&lt;XCircle size={16} className="shrink-0 mt-0.5" /&gt; &lt;span&gt;{loginError}&lt;/span&gt;&lt;/div&gt;}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;form onSubmit={handleLogin} className="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="text" name="username" placeholder="Kode Kasir (Contoh: admin)" required className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-blue-400 outline-none bg-white/90 text-gray-800" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="password" name="password" placeholder="PIN Kasir" required className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-blue-400 outline-none bg-white/90 text-gray-800" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 rounded-xl shadow-lg border border-blue-500"&gt;Masuk Aplikasi&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="pt-3 text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p className="text-xs text-white/50 font-medium"&gt;Hubungi Pemilik/Owner jika Anda lupa PIN.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="min-h-screen bg-gray-50 flex flex-col font-sans pb-20 print:pb-0 print:bg-white"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;header className="bg-white shadow-sm sticky top-0 z-20 print:hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{settings.logo ? (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;img src={settings.logo} alt="Logo" className="w-10 h-10 object-cover rounded-full border border-gray-200" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold"&gt;{settings.storeName.charAt(0)}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">               </span>&lt;h1 className="font-bold text-gray-800 text-sm sm:text-lg leading-tight"&gt;{settings.storeName}&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">               </span>&lt;p className="text-[10px] text-gray-500 font-medium flex items-center gap-1"&gt;&lt;UserCircle size={12}/&gt; Kasir: {currentUser?.namaKasir || 'Staff'}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">          </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="hidden sm:flex flex-1 max-w-md mx-4 relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="text" placeholder="Cari transaksi, produk..." value={searchQuery} onChange={(e) =&gt; setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onClick={() =&gt; { setIsLoggedIn(false); setCurrentUser(null); }} className="text-gray-500 hover:text-red-500 transition-colors p-2 flex items-center gap-1 text-sm font-medium"&gt;&lt;LogOut size={20} /&gt; &lt;span className="hidden sm:inline"&gt;Keluar&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;main className="flex-1 max-w-7xl mx-auto w-full p-4 print:p-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{isDbLoading ? (</p>
+<p class="p1"><span class="Apple-converted-space">           </span>&lt;div className="flex flex-col items-center justify-center h-[50vh] text-gray-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;Package className="animate-bounce text-blue-500 mb-4" size={48} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p className="font-medium animate-pulse"&gt;Menyiapkan Data dari Google Sheets...&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">           </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{activeTab === 'dashboard' &amp;&amp; &lt;DashboardView transactions={transactions} formatRupiah={formatRupiah} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{activeTab === 'produk' &amp;&amp; &lt;ProdukView products={products} onSaveProduct={saveProductDb} onDeleteProduct={deleteProductDb} formatRupiah={formatRupiah} searchQuery={searchQuery} compressImage={compressImage} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{activeTab === 'kasir' &amp;&amp; &lt;KasirView products={products} transactions={transactions} onSaveTransaction={saveTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} settings={settings} editingTrx={editingTrx} clearEditingTrx={() =&gt; setEditingTrx(null)} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{activeTab === 'laporan' &amp;&amp; &lt;LaporanView transactions={transactions} onDeleteTransaction={deleteTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} onLoadToKasir={(trx)=&gt;{setEditingTrx(trx); setActiveTab('kasir');}} settings={settings} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{activeTab === 'setup' &amp;&amp; &lt;SetupView settings={settings} onSaveSettings={updateSettingsDb} compressImage={compressImage} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;nav className="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-16 z-30 px-2 sm:px-6 print:hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;NavItem icon={&lt;Home size={24} /&gt;} label="Dashboard" isActive={activeTab === 'dashboard'} onClick={() =&gt; setActiveTab('dashboard')} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;NavItem icon={&lt;Package size={24} /&gt;} label="Produk" isActive={activeTab === 'produk'} onClick={() =&gt; setActiveTab('produk')} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="-mt-6 relative flex flex-col items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onClick={() =&gt; setActiveTab('kasir')} className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg text-white transition-transform hover:scale-105 active:scale-95 ${activeTab === 'kasir' ? 'bg-blue-700 ring-4 ring-blue-100' : 'bg-blue-500'}`}&gt;&lt;ShoppingCart size={28} /&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span className={`text-[10px] font-bold mt-1 ${activeTab === 'kasir' ? 'text-blue-700' : 'text-gray-500'}`}&gt;KASIR&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;NavItem icon={&lt;FileText size={24} /&gt;} label="Laporan" isActive={activeTab === 'laporan'} onClick={() =&gt; setActiveTab('laporan')} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;NavItem icon={&lt;Settings size={24} /&gt;} label="Setup" isActive={activeTab === 'setup'} onClick={() =&gt; setActiveTab('setup')} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/nav&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function ProdukView({ products, onSaveProduct, onDeleteProduct, formatRupiah, searchQuery, compressImage }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [isModalOpen, setIsModalOpen] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [editingProduct, setEditingProduct] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [name, setName] = useState(''); const [price, setPrice] = useState(''); const [unit, setUnit] = useState('Kg'); const [category, setCategory] = useState('Kiloan'); const [image, setImage] = useState(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filteredProducts = products.filter(p =&gt; p.name.toLowerCase().includes(searchQuery.toLowerCase()));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleImageUpload = async (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (e.target.files[0]) setImage(await compressImage(e.target.files[0]));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const openModal = (product = null) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (product) { setEditingProduct(product); setName(product.name); setPrice(product.price); setUnit(product.unit); setCategory(product.category); setImage(product.image); }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>else { setEditingProduct(null); setName(''); setPrice(''); setUnit('Kg'); setCategory('Kiloan'); setImage(null); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setIsModalOpen(true);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const saveProduct = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>onSaveProduct({ id: editingProduct ? editingProduct.id : Date.now(), name, price: Number(price), unit, category, image });</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setIsModalOpen(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="space-y-4 animate-in fade-in duration-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="flex justify-between items-center mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 className="text-2xl font-bold text-gray-800"&gt;Manajemen Layanan&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onClick={() =&gt; openModal()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"&gt;&lt;Plus size={20} /&gt; &lt;span className="hidden sm:inline"&gt;Tambah Produk&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{filteredProducts.map(p =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div key={p.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md flex flex-col"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="h-24 sm:h-28 bg-gray-100 relative"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{p.image ? &lt;img src={p.image} className="w-full h-full object-cover" /&gt; : &lt;div className="w-full h-full flex items-center justify-center text-gray-400"&gt;&lt;ImageIcon size={28} /&gt;&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className="absolute top-1 right-1 bg-white px-1.5 py-0.5 text-[10px] font-bold rounded-md shadow text-blue-600"&gt;{p.category}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="p-2 sm:p-3 flex-1 flex flex-col justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 className="font-bold text-gray-800 text-xs sm:text-sm mb-1 leading-tight line-clamp-2"&gt;{p.name}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p className="text-blue-600 font-semibold text-xs"&gt;{formatRupiah(p.price)} &lt;span className="text-gray-500 text-[10px] font-normal"&gt;/ {p.unit}&lt;/span&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex gap-1.5 mt-2 pt-2 border-t border-gray-100"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onClick={() =&gt; openModal(p)} className="flex-1 bg-gray-50 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg flex items-center justify-center gap-1 text-[10px] font-medium"&gt;&lt;Edit size={12} /&gt; Edit&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onClick={() =&gt; onDeleteProduct(p.id)} className="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1.5 rounded-lg flex items-center justify-center"&gt;&lt;Trash2 size={12} /&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{isModalOpen &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="p-6 border-b border-gray-100"&gt;&lt;h3 className="text-xl font-bold text-gray-800"&gt;{editingProduct ? 'Edit Layanan' : 'Tambah Layanan Baru'}&lt;/h3&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;form onSubmit={saveProduct} className="p-6 space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;&lt;label className="block text-sm font-medium mb-1"&gt;Nama Layanan&lt;/label&gt;&lt;input type="text" required value={name} onChange={e=&gt;setName(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="grid grid-cols-2 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;&lt;label className="block text-sm font-medium mb-1"&gt;Harga&lt;/label&gt;&lt;input type="number" required value={price} onChange={e=&gt;setPrice(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;&lt;label className="block text-sm font-medium mb-1"&gt;Satuan&lt;/label&gt;&lt;select value={unit} onChange={e=&gt;setUnit(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"&gt;&lt;option value="Kg"&gt;Kg&lt;/option&gt;&lt;option value="Pcs"&gt;Pcs&lt;/option&gt;&lt;option value="Psg"&gt;Pasang&lt;/option&gt;&lt;option value="Meter"&gt;Meter&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;&lt;label className="block text-sm font-medium mb-1"&gt;Kategori&lt;/label&gt;&lt;select value={category} onChange={e=&gt;setCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"&gt;&lt;option value="Kiloan"&gt;Kiloan&lt;/option&gt;&lt;option value="Satuan"&gt;Satuan&lt;/option&gt;&lt;option value="Sepatu"&gt;Sepatu/Tas&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;label className="block text-sm font-medium mb-1"&gt;Foto Layanan&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="flex items-center gap-4"&gt;{image &amp;&amp; &lt;img src={image} className="w-16 h-16 rounded object-cover" /&gt;}&lt;input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm" /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="flex gap-3 pt-4"&gt;&lt;button type="button" onClick={()=&gt;setIsModalOpen(false)} className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg"&gt;Batal&lt;/button&gt;&lt;button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg"&gt;Simpan&lt;/button&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function KasirView({ products, transactions, onSaveTransaction, formatRupiah, searchQuery, settings, editingTrx, clearEditingTrx }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [cart, setCart] = useState([]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [customerName, setCustomerName] = useState(''); const [customerPhone, setCustomerPhone] = useState(''); const [pickupDate, setPickupDate] = useState(new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [trxId, setTrxId] = useState(null); const [receiptData, setReceiptData] = useState(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (editingTrx) { setCart(editingTrx.items); setCustomerName(editingTrx.customer); setCustomerPhone(editingTrx.customerPhone || ''); setPickupDate(editingTrx.pickupDate || ''); setTrxId(editingTrx.id); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}, [editingTrx]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cancelEdit = () =&gt; { setCart([]); setCustomerName(''); setCustomerPhone(''); setPickupDate(new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0]); setTrxId(null); clearEditingTrx(); };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filteredProducts = products.filter(p =&gt; p.name.toLowerCase().includes(searchQuery.toLowerCase()));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const addToCart = (product) =&gt; { setCart(cart.find(i =&gt; i.id === product.id) ? cart.map(i =&gt; i.id === product.id ? { ...i, qty: (parseFloat(i.qty) || 0) + 1 } : i) : [...cart, { ...product, qty: 1 }]); };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const updateQty = (id, delta) =&gt; { setCart(cart.map(i =&gt; { if (i.id === id) { const n = (parseFloat(i.qty) || 0) + delta; return n &gt; 0 ? { ...i, qty: n } : null; } return i; }).filter(Boolean)); };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleQtyChange = (id, val) =&gt; setCart(cart.map(i =&gt; i.id === id ? { ...i, qty: val } : i));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const removeCartItem = (id) =&gt; setCart(cart.filter(i =&gt; i.id !== id));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const totalCart = cart.reduce((sum, item) =&gt; sum + (item.price * (parseFloat(item.qty) || 0)), 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleCheckout = (status) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (cart.length === 0) return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cleanCart = cart.map(i =&gt; ({...i, qty: parseFloat(i.qty) || 0})).filter(i =&gt; i.qty &gt; 0);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const newTrx = { id: trxId || `TRX-${Date.now().toString().slice(-6)}`, customer: customerName || 'Pelanggan Baru', customerPhone: customerPhone, items: cleanCart, total: totalCart, status: status, date: trxId &amp;&amp; editingTrx ? editingTrx.date : new Date().toISOString(), pickupDate: pickupDate };</p>
+<p class="p1"><span class="Apple-converted-space">    </span>onSaveTransaction(newTrx); setReceiptData(newTrx); cancelEdit();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="flex flex-row gap-3 sm:gap-6 animate-in fade-in h-[calc(100vh-140px)]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="flex-1 overflow-y-auto pr-1 pb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 className="text-lg font-bold text-gray-800 mb-4"&gt;Pilih Layanan&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{filteredProducts.map(p =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button key={p.id} onClick={() =&gt; addToCart(p)} className="bg-white rounded-xl border p-2 flex flex-col items-center text-center hover:border-blue-500 group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-2 overflow-hidden"&gt;{p.image ? &lt;img src={p.image} className="w-full h-full object-cover" /&gt; : &lt;Package size={24} className="text-blue-500" /&gt;}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;h3 className="font-medium text-xs mb-1 line-clamp-2"&gt;{p.name}&lt;/h3&gt;&lt;p className="text-blue-600 font-bold text-xs mb-2"&gt;{formatRupiah(p.price)}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div className="mt-auto w-full py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded"&gt;+ Tambah&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="w-[280px] sm:w-[340px] bg-white rounded-2xl shadow-lg border flex flex-col shrink-0 h-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="p-3 border-b bg-gray-50 rounded-t-2xl space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="flex justify-between items-center"&gt;&lt;h2 className="font-bold text-gray-800"&gt;Pesanan {trxId ? 'Diedit' : 'Saat Ini'}&lt;/h2&gt;{trxId &amp;&amp; &lt;button onClick={cancelEdit} className="text-red-500 text-xs font-bold"&gt;&lt;XCircle size={14} className="inline"/&gt; Batal&lt;/button&gt;}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;input type="text" placeholder="Nama Pelanggan" value={customerName} onChange={e=&gt;setCustomerName(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:ring-1 outline-none" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;input type="text" placeholder="No. WA (0812...)" value={customerPhone} onChange={e=&gt;setCustomerPhone(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:ring-1 outline-none" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="flex items-center gap-2 bg-white px-2 py-1.5 border rounded text-sm"&gt;&lt;CalendarDays size={14} className="text-gray-400"/&gt;&lt;span className="text-gray-500 text-xs flex-1"&gt;Ambil:&lt;/span&gt;&lt;input type="date" value={pickupDate} onChange={e=&gt;setPickupDate(e.target.value)} className="outline-none text-right font-medium cursor-pointer bg-transparent"/&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="flex-1 overflow-y-auto p-3 space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{cart.length===0 ? &lt;div className="h-full flex flex-col items-center justify-center text-gray-400 text-sm"&gt;&lt;ShoppingCart size={32} className="mb-2 opacity-50"/&gt;Keranjang Kosong&lt;/div&gt; :<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">           </span>cart.map(i =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div key={i.id} className="bg-gray-50 p-2 rounded border"&gt;&lt;div className="flex justify-between items-start mb-2"&gt;&lt;div className="flex-1"&gt;&lt;h4 className="text-xs font-bold leading-tight"&gt;{i.name}&lt;/h4&gt;&lt;p className="text-[10px] text-gray-500"&gt;{formatRupiah(i.price)}/{i.unit}&lt;/p&gt;&lt;/div&gt;&lt;button onClick={()=&gt;removeCartItem(i.id)} className="text-red-400 p-1"&gt;&lt;Trash2 size={12}/&gt;&lt;/button&gt;&lt;/div&gt;&lt;div className="flex justify-between items-center"&gt;&lt;div className="flex bg-white border rounded"&gt;&lt;button onClick={()=&gt;updateQty(i.id, -1)} className="px-2 bg-gray-100"&gt;-&lt;/button&gt;&lt;input type="number" value={i.qty} onChange={e=&gt;handleQtyChange(i.id, e.target.value)} className="w-10 text-center text-xs font-bold border-x py-0.5 outline-none"/&gt;&lt;button onClick={()=&gt;updateQty(i.id, 1)} className="px-2 bg-gray-100"&gt;+&lt;/button&gt;&lt;/div&gt;&lt;p className="text-xs font-bold"&gt;{formatRupiah(i.price*(parseFloat(i.qty)||0))}&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="p-3 border-t bg-white rounded-b-2xl"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="flex justify-between items-center mb-3"&gt;&lt;span className="text-sm font-medium"&gt;Total Tagihan&lt;/span&gt;&lt;span className="text-xl font-bold"&gt;{formatRupiah(totalCart)}&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="grid grid-cols-2 gap-2"&gt;&lt;button onClick={()=&gt;handleCheckout('Belum Lunas')} disabled={cart.length===0} className="py-2 bg-orange-100 text-orange-700 font-semibold rounded-xl text-xs flex flex-col items-center"&gt;&lt;Clock size={16}/&gt;Simpan (Tunda)&lt;/button&gt;&lt;button onClick={()=&gt;handleCheckout('Lunas')} disabled={cart.length===0} className="py-2 bg-blue-600 text-white font-semibold rounded-xl text-xs flex flex-col items-center"&gt;&lt;CheckCircle2 size={16}/&gt;Bayar Lunas&lt;/button&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{receiptData &amp;&amp; &lt;ReceiptModal data={receiptData} settings={settings} onClose={()=&gt;setReceiptData(null)} formatRupiah={formatRupiah} /&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function LaporanView({ transactions, onDeleteTransaction, formatRupiah, searchQuery, onLoadToKasir, settings }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [startDate, setStartDate] = useState(''); const [endDate, setEndDate] = useState('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filteredTrx = transactions.filter(t =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!t.id.toLowerCase().includes(searchQuery.toLowerCase()) &amp;&amp; !t.customer.toLowerCase().includes(searchQuery.toLowerCase())) return false;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const d = new Date(t.date); if (startDate &amp;&amp; d &lt; new Date(startDate)) return false; if (endDate &amp;&amp; d &gt; new Date(endDate+"T23:59:59")) return false;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return true;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}).sort((a,b) =&gt; new Date(b.date) - new Date(a.date));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const totalOmset = filteredTrx.filter(t =&gt; t.status === 'Lunas').reduce((s, t) =&gt; s + t.total, 0);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="space-y-4 animate-in fade-in"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="flex justify-between items-center print:hidden"&gt;&lt;h2 className="text-xl font-bold text-gray-800"&gt;Laporan&lt;/h2&gt;&lt;button onClick={()=&gt;window.print()} className="bg-green-600 text-white px-3 py-1.5 rounded flex items-center gap-1 text-sm"&gt;&lt;Download size={14}/&gt; Cetak PDF&lt;/button&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="bg-white p-3 rounded-lg shadow-sm border flex gap-3 print:hidden text-sm"&gt;&lt;input type="date" value={startDate} onChange={e=&gt;setStartDate(e.target.value)} className="border rounded px-2 py-1 outline-none"/&gt;&lt;input type="date" value={endDate} onChange={e=&gt;setEndDate(e.target.value)} className="border rounded px-2 py-1 outline-none"/&gt;{(startDate||endDate)&amp;&amp;&lt;button onClick={()=&gt;{setStartDate('');setEndDate('');}} className="text-xs text-red-500 hover:underline"&gt;Reset&lt;/button&gt;}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="hidden print:block text-center border-b-2 pb-2 mb-4"&gt;&lt;h1 className="text-xl font-bold"&gt;{settings.storeName}&lt;/h1&gt;&lt;p className="text-xs text-gray-600"&gt;Laporan Transaksi&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="bg-white rounded-lg border overflow-x-auto"&gt;&lt;table className="w-full text-left text-sm print:text-xs"&gt;&lt;thead&gt;&lt;tr className="bg-gray-50 border-b"&gt;&lt;th className="p-3"&gt;Pelanggan&lt;/th&gt;&lt;th className="p-3"&gt;Tanggal&lt;/th&gt;&lt;th className="p-3"&gt;Item&lt;/th&gt;&lt;th className="p-3 text-right"&gt;Total&lt;/th&gt;&lt;th className="p-3 text-center"&gt;Status&lt;/th&gt;&lt;th className="p-3 print:hidden"&gt;Aksi&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody className="divide-y"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{filteredTrx.map(t =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr key={t.id} className="hover:bg-gray-50"&gt;&lt;td className="p-3"&gt;&lt;p className="font-bold"&gt;{t.customer}&lt;/p&gt;&lt;p className="text-[10px] text-gray-400"&gt;{t.id}&lt;/p&gt;&lt;/td&gt;&lt;td className="p-3"&gt;&lt;p&gt;{new Date(t.date).toLocaleDateString('id-ID')}&lt;/p&gt;&lt;/td&gt;&lt;td className="p-3 text-gray-500 text-xs"&gt;{t.items.map(i=&gt;`${i.qty}${i.unit} ${i.name}`).join(', ')}&lt;/td&gt;&lt;td className="p-3 text-right font-bold"&gt;{formatRupiah(t.total)}&lt;/td&gt;&lt;td className="p-3 text-center"&gt;&lt;span className={`px-2 py-0.5 rounded text-[10px] font-bold ${t.status==='Lunas'?'bg-green-100 text-green-700':'bg-orange-100 text-orange-700'}`}&gt;{t.status}&lt;/span&gt;&lt;/td&gt;&lt;td className="p-3 print:hidden flex gap-2"&gt;{t.status==='Belum Lunas' &amp;&amp; &lt;button onClick={()=&gt;onLoadToKasir(t)} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold"&gt;Bayar&lt;/button&gt;}&lt;button onClick={()=&gt;onDeleteTransaction(t.id)} className="text-red-400 hover:text-red-600"&gt;&lt;Trash2 size={16}/&gt;&lt;/button&gt;&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="text-right font-bold text-lg p-2"&gt;Total Lunas: {formatRupiah(totalOmset)}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function SetupView({ settings, onSaveSettings, compressImage }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [formData, setFormData] = useState(settings); const [saved, setSaved] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>useEffect(() =&gt; { setFormData(settings); }, [settings]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleLogoUpload = async (e) =&gt; { if(e.target.files[0]) setFormData({...formData, logo: await compressImage(e.target.files[0])}); };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleSave = (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>e.preventDefault();<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>onSaveSettings(formData); setSaved(true); setTimeout(()=&gt;setSaved(false), 3000);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="max-w-2xl mx-auto space-y-4 animate-in fade-in"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 className="text-xl font-bold"&gt;Setup Toko&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="bg-white rounded-xl shadow-sm border p-6"&gt;&lt;form onSubmit={handleSave} className="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="flex items-center gap-4 border-b pb-4"&gt;&lt;div className="w-16 h-16 bg-blue-50 rounded-full border-2 border-dashed flex items-center justify-center relative overflow-hidden"&gt;{formData.logo ? &lt;img src={formData.logo} className="w-full h-full object-cover"/&gt; : &lt;ImageIcon size={24}/&gt;}&lt;input type="file" accept="image/*" onChange={handleLogoUpload} className="absolute inset-0 opacity-0 cursor-pointer"/&gt;&lt;/div&gt;&lt;div&gt;&lt;p className="text-sm font-medium"&gt;Logo Toko&lt;/p&gt;&lt;button type="button" onClick={()=&gt;setFormData({...formData, logo:null})} className="text-xs text-red-500"&gt;Hapus&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label className="text-sm font-medium"&gt;Nama Toko&lt;/label&gt;&lt;input type="text" required value={formData.storeName} onChange={e=&gt;setFormData({...formData, storeName:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label className="text-sm font-medium"&gt;Alamat&lt;/label&gt;&lt;textarea required rows="2" value={formData.address} onChange={e=&gt;setFormData({...formData, address:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;label className="text-sm font-medium"&gt;No Telp&lt;/label&gt;&lt;input type="text" required value={formData.phone} onChange={e=&gt;setFormData({...formData, phone:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/&gt;&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">           </span>&lt;div className="flex items-start gap-2 text-blue-800"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;UserCircle className="shrink-0 mt-0.5" size={18} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>&lt;h3 className="font-bold text-sm"&gt;Manajemen Akun Kasir &amp; Keamanan&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>&lt;p className="text-xs text-blue-700/80 mt-1 leading-relaxed"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                   </span>Pembuatan akun baru, ganti nama kasir, dan perubahan PIN / Password sekarang dilakukan langsung melalui File &lt;b&gt;Google Sheets&lt;/b&gt; Anda di tab &lt;b&gt;"Staff"&lt;/b&gt;.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                 </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">           </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="flex justify-between items-center pt-2"&gt;{saved?&lt;span className="text-green-600 text-sm font-bold"&gt;Tersimpan!&lt;/span&gt;:&lt;span&gt;&lt;/span&gt;}&lt;button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded font-bold"&gt;Simpan Info Toko&lt;/button&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/form&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function DashboardView({ transactions, formatRupiah }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const tLunas = transactions.filter(t=&gt;t.status==='Lunas').reduce((s,t)=&gt;s+t.total,0); const tPiutang = transactions.filter(t=&gt;t.status==='Belum Lunas').reduce((s,t)=&gt;s+t.total,0);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="space-y-4 animate-in fade-in"&gt;&lt;h2 className="text-xl font-bold"&gt;Dashboard&lt;/h2&gt;&lt;div className="grid grid-cols-1 md:grid-cols-3 gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="bg-blue-600 p-4 rounded-xl text-white shadow"&gt;&lt;div className="flex items-center gap-2 mb-1"&gt;&lt;FileText size={16}/&gt;&lt;span&gt;Total Transaksi&lt;/span&gt;&lt;/div&gt;&lt;p className="text-2xl font-bold"&gt;{transactions.length}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="bg-green-600 p-4 rounded-xl text-white shadow"&gt;&lt;div className="flex items-center gap-2 mb-1"&gt;&lt;CheckCircle2 size={16}/&gt;&lt;span&gt;Omset Lunas&lt;/span&gt;&lt;/div&gt;&lt;p className="text-2xl font-bold"&gt;{formatRupiah(tLunas)}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="bg-orange-500 p-4 rounded-xl text-white shadow"&gt;&lt;div className="flex items-center gap-2 mb-1"&gt;&lt;Clock size={16}/&gt;&lt;span&gt;Belum Lunas&lt;/span&gt;&lt;/div&gt;&lt;p className="text-2xl font-bold"&gt;{formatRupiah(tPiutang)}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function ReceiptModal({ data, settings, onClose, formatRupiah }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleWA = () =&gt; { if(data.customerPhone) window.open(`https://wa.me/${data.customerPhone.startsWith('0')?'62'+data.customerPhone.slice(1):data.customerPhone}?text=${encodeURIComponent(`Halo *${data.customer}*,\nPesanan dari *${settings.storeName}*:\nID: *${data.id}*\nTotal: *${formatRupiah(data.total)}*\nStatus: *${data.status}*\nAmbil: ${data.pickupDate||'-'}\nTerima kasih!`)}`,'_blank'); };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const handleBT = async () =&gt; { alert("Sambungkan printer dari Bluetooth settings HP lalu klik Cetak PDF jika menggunakan PrintShare/sejenisnya, atau gunakan browser Chrome Android untuk fitur ini."); };</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"&gt;&lt;div className="bg-white rounded-xl w-full max-w-sm flex flex-col max-h-[85vh]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="receipt-content" className="p-6 overflow-y-auto font-mono text-xs"&gt;&lt;div className="text-center mb-4"&gt;{settings.logo&amp;&amp;&lt;img src={settings.logo} className="w-12 h-12 mx-auto mb-1 grayscale" /&gt;}&lt;h2 className="font-bold text-sm uppercase"&gt;{settings.storeName}&lt;/h2&gt;&lt;p&gt;{settings.address}&lt;/p&gt;&lt;p&gt;{settings.phone}&lt;/p&gt;&lt;/div&gt;&lt;div className="border-y border-dashed py-2 mb-2 space-y-1"&gt;&lt;div className="flex justify-between"&gt;&lt;span&gt;No:&lt;/span&gt;&lt;span&gt;{data.id}&lt;/span&gt;&lt;/div&gt;&lt;div className="flex justify-between"&gt;&lt;span&gt;Tgl:&lt;/span&gt;&lt;span&gt;{new Date(data.date).toLocaleDateString('id-ID')}&lt;/span&gt;&lt;/div&gt;&lt;div className="flex justify-between"&gt;&lt;span&gt;Nama:&lt;/span&gt;&lt;span className="font-bold"&gt;{data.customer}&lt;/span&gt;&lt;/div&gt;&lt;div className="flex justify-between"&gt;&lt;span&gt;Status:&lt;/span&gt;&lt;span className="font-bold"&gt;{data.status}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div className="space-y-1 mb-2"&gt;{data.items.map((i,x)=&gt;&lt;div key={x}&gt;&lt;div className="font-bold"&gt;{i.name}&lt;/div&gt;&lt;div className="flex justify-between text-gray-600"&gt;&lt;span&gt;{i.qty} x {formatRupiah(i.price)}&lt;/span&gt;&lt;span&gt;{formatRupiah(i.price*i.qty)}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;)}&lt;/div&gt;&lt;div className="border-t border-dashed pt-2 flex justify-between font-bold text-sm"&gt;&lt;span&gt;TOTAL&lt;/span&gt;&lt;span&gt;{formatRupiah(data.total)}&lt;/span&gt;&lt;/div&gt;&lt;div className="text-center mt-6 text-gray-500"&gt;*** TERIMA KASIH ***&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div className="p-3 bg-gray-50 grid grid-cols-2 gap-2 border-t print:hidden"&gt;&lt;button onClick={handleWA} className="py-2 bg-green-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1"&gt;&lt;MessageCircle size={14}/&gt; WA&lt;/button&gt;&lt;button onClick={handleBT} className="py-2 bg-indigo-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1"&gt;&lt;Bluetooth size={14}/&gt; BT Print&lt;/button&gt;&lt;button onClick={()=&gt;window.print()} className="py-2 bg-blue-600 text-white rounded font-bold text-xs flex items-center justify-center gap-1"&gt;&lt;Printer size={14}/&gt; Cetak&lt;/button&gt;&lt;button onClick={onClose} className="py-2 bg-white text-gray-700 rounded border font-bold text-xs"&gt;Tutup&lt;/button&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;style dangerouslySetInnerHTML={{__html: `@media print { body * { visibility: hidden; } #receipt-content, #receipt-content * { visibility: visible; } #receipt-content { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; } }`}} /&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function NavItem({ icon, label, isActive, onClick }) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return (&lt;button onClick={onClick} className={`flex flex-col items-center justify-center w-16 transition-colors ${isActive ? 'text-blue-600' : 'text-gray-400'}`}&gt;&lt;div className={`${isActive ? 'scale-110 mb-1' : 'scale-100 mb-0'}`}&gt;{icon}&lt;/div&gt;&lt;span className={`text-[10px] font-medium ${isActive ? 'opacity-100' : 'opacity-0 h-0'}`}&gt;{label}&lt;/span&gt;&lt;/button&gt;);</p>
+<p class="p1">}</p>
+</body>
+</html>
