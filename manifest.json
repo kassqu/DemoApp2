@@ -1,7 +1,7 @@
 {
-  "name": "Toko..(ganti sesuai nama klien)",
+  "name": "Laundry Clean & Fresh",
   "short_name": "KassQu",
-  "description": "Aplikasi Kasir Modern Toko ..... (ganti sesuai nama klien)",
+  "description": "Aplikasi Laundry Modern by Fika Naka",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#4f46e5",
