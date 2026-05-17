@@ -4,8 +4,8 @@
   "description": "Aplikasi Laundry Modern by Fika Naka",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#4f46e5",
-  "theme_color": "#4338ca",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "logo.png",
