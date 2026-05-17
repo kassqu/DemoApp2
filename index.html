@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KassQu</title>
+    <title>KASSQU POS</title>
     
     <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json" />
@@ -37,6 +37,7 @@
         const SPLASH_BG_IMAGE = "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&q=80&w=2000";
         const LOGIN_BG_IMAGE = "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=2000";
 
+        // PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxR1PppWpHWrvku-14G-vfYUAvTy13S8N69iZfjNfAhZKs2SHU3d6uQNjEJKm7aWlI/exec"; 
         // ==========================================
 
@@ -76,7 +77,7 @@
 
         // --- DATA DEFAULT ---
         const INITIAL_SETTINGS = {
-            storeName: 'Clean & Fresh Laundry',
+            storeName: 'Laundry Clean & Fresh',
             address: 'Jl. Merdeka No. 123, Jakarta',
             phone: '0812-3456-7890',
             logo: null
@@ -158,8 +159,19 @@
 
                 if (res.status === 'success') {
                     const staffData = res.data.staff || [];
-                    let validUser = staffData.find(s => s.kodeKasir === inputUser && s.pin === inputPass && s.status.toLowerCase() === 'aktif');
-                    if (!validUser && inputUser === 'admin' && inputPass === '123') validUser = { kodeKasir: 'admin', namaKasir: 'Admin Utama', status: 'aktif' };
+                    
+                    // PERBAIKAN: Konversi semua ke Teks (String) & cover berbagai variasi nama kolom GSheet
+                    let validUser = staffData.find(s => {
+                        const dbUser = String(s.kodeKasir || s['Kode Kasir'] || '').trim();
+                        const dbPin = String(s.pin || s['PIN'] || s.PIN || '').trim();
+                        const dbStatus = String(s.status || s['Status'] || s.Status || '').trim().toLowerCase();
+                        
+                        return dbUser === inputUser && dbPin === inputPass && dbStatus === 'aktif';
+                    });
+
+                    if (!validUser && inputUser === 'admin' && inputPass === '123') {
+                        validUser = { kodeKasir: 'admin', namaKasir: 'Admin Utama', status: 'aktif' };
+                    }
 
                     if (validUser) {
                         setCurrentUser(validUser);
@@ -167,8 +179,12 @@
                         if (res.data.products && res.data.products.length > 0) setProducts(res.data.products);
                         if (res.data.transactions) setTransactions(res.data.transactions);
                         setIsLoggedIn(true); setLoginError('');
-                    } else setLoginError('Kode Kasir/PIN salah, atau akun nonaktif!');
-                } else setLoginError(res.message || 'Gagal koneksi ke server database.');
+                    } else {
+                        setLoginError('Kode Kasir/PIN salah, atau akun nonaktif!');
+                    }
+                } else {
+                    setLoginError(res.message || 'Gagal koneksi ke server database.');
+                }
             };
 
             const updateSettingsDb = async (newData) => { setSettings(newData); await fetchFromGAS({ action: 'SAVE_SETTINGS', data: newData }); };
