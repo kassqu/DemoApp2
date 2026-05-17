@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KASSQU</title>
+    <title>KassQu</title>
     
     <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json" />
@@ -37,7 +37,6 @@
         const SPLASH_BG_IMAGE = "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&q=80&w=2000";
         const LOGIN_BG_IMAGE = "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=2000";
 
-        // PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxR1PppWpHWrvku-14G-vfYUAvTy13S8N69iZfjNfAhZKs2SHU3d6uQNjEJKm7aWlI/exec"; 
         // ==========================================
 
@@ -64,7 +63,9 @@
             Bluetooth: <polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/>,
             Calculator: <><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></>,
             UserCircle: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></>,
-            AlertTriangle: <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>
+            AlertTriangle: <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+            // Ikon point_of_sale (Mesin Kasir / POS)
+            point_of_sale: <><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M4 10h16"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/><line x1="8" y1="17" x2="8.01" y2="17"/><line x1="12" y1="17" x2="12.01" y2="17"/><line x1="16" y1="17" x2="16.01" y2="17"/></>
         };
 
         const Icon = ({ name, size = 24, className = "" }) => (
@@ -75,7 +76,7 @@
 
         // --- DATA DEFAULT ---
         const INITIAL_SETTINGS = {
-            storeName: 'Laundry Clean & Fresh',
+            storeName: 'Clean & Fresh Laundry',
             address: 'Jl. Merdeka No. 123, Jakarta',
             phone: '0812-3456-7890',
             logo: null
@@ -185,15 +186,21 @@
 
             if (showSplash) {
                 return (
-                    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center text-white" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                         <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-md"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
-                            <div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-12 drop-shadow-md"></div>
-                            <div className="flex items-center gap-4 mb-4">
-                                {DEV_COMPANY_LOGO ? <img src={DEV_COMPANY_LOGO} alt="Logo" className="w-16 h-16 object-cover rounded-2xl drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" /> : <div className="w-[4.5rem] h-[4.5rem] bg-[#5c5cff] rounded-2xl flex items-center justify-center drop-shadow-[0_0_15px_rgba(99,102,241,0.6)]"><Icon name="Calculator" size={40} className="text-white" /></div>}
-                                <h1 className="text-[3.5rem] leading-none font-black text-white tracking-widest drop-shadow-lg uppercase" style={{ fontFamily: 'Tahoma, sans-serif' }}>KASSQU</h1>
+                            
+                            {/* Animasi loading muter */}
+                            <div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-8 drop-shadow-md"></div>
+
+                            <div className="flex items-center gap-3 animate-fade-in">
+                                <div className="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
+                                    <Icon name="point_of_sale" className="text-white text-3xl" />
+                                </div>
+                                <h1 className="text-4xl font-black tracking-widest drop-shadow-md" style={{ fontFamily: 'Tahoma, sans-serif' }}>KASSQU</h1>
                             </div>
-                            <p className="text-gray-200 font-medium text-sm mt-4">Menyiapkan toko Anda...</p>
+                            <p className="text-sm opacity-80 mt-4">Menyiapkan toko Anda...</p>
+
                         </div>
                     </div>
                 );
@@ -337,7 +344,7 @@
                     </div>
                     <div className="w-[280px] sm:w-[340px] bg-white rounded-2xl shadow-lg border flex flex-col shrink-0 h-full">
                         <div className="p-3 border-b bg-gray-50 rounded-t-2xl space-y-2">
-                            <div className="flex justify-between items-center"><h2 className="font-bold text-gray-800">Pesanan {trxId ? 'Diedit' : 'Saat Ini'}</h2>{trxId && <button onClick={cancelEdit} className="text-red-500 text-xs font-bold"><Icon name="XCircle" size={14} className="inline"/> Batal</button>}</div>
+                            <div className="flex justify-between items-center"><h2 className="font-bold text-gray-800">{trxId ? 'Pesanan Diedit' : 'Pesanan Saat Ini'}</h2>{trxId && <button onClick={cancelEdit} className="text-red-500 text-xs font-bold"><Icon name="XCircle" size={14} className="inline"/> Batal</button>}</div>
                             <input type="text" placeholder="Nama Pelanggan" value={customerName} onChange={e=>setCustomerName(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:ring-1 outline-none" />
                             <input type="text" placeholder="No. WA (0812...)" value={customerPhone} onChange={e=>setCustomerPhone(e.target.value)} className="w-full px-2 py-1.5 text-sm border rounded focus:ring-1 outline-none" />
                             <div className="flex items-center gap-2 bg-white px-2 py-1.5 border rounded text-sm"><Icon name="CalendarDays" size={14} className="text-gray-400"/><span className="text-gray-500 text-xs flex-1">Ambil:</span><input type="date" value={pickupDate} onChange={e=>setPickupDate(e.target.value)} className="outline-none text-right font-medium cursor-pointer bg-transparent"/></div>
@@ -395,7 +402,7 @@
                         <div><label className="text-sm font-medium">Nama Toko</label><input type="text" required value={formData.storeName} onChange={e=>setFormData({...formData, storeName:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">Alamat</label><textarea required rows="2" value={formData.address} onChange={e=>setFormData({...formData, address:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">No Telp</label><input type="text" required value={formData.phone} onChange={e=>setFormData({...formData, phone:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
-                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun Kasir & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Pembuatan akun baru, ganti nama kasir, dan perubahan PIN / Password sekarang dilakukan langsung melalui File <b>Google Sheets</b> Anda di tab <b>"Staff"</b>.</p></div></div></div>
+                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun Kasir & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Pembuatan akun baru, ganti nama kasir, dan perubahan PIN / Password sekarang dilakukan langsung melalui File Google Sheets Anda di tab "Staff".</p></div></div></div>
                         <div className="flex justify-between items-center pt-2">{saved?<span className="text-green-600 text-sm font-bold">Tersimpan!</span>:<span></span>}<button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Simpan Info Toko</button></div>
                     </form></div>
                 </div>
@@ -462,7 +469,7 @@
             const handleBT = async () => { alert("Sambungkan printer dari Bluetooth settings HP lalu klik Cetak PDF jika menggunakan PrintShare/sejenisnya, atau gunakan browser Chrome Android untuk fitur ini."); };
             return (
                 <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-xl w-full max-w-sm flex flex-col max-h-[85vh]">
-                    <div id="receipt-content" className="p-6 overflow-y-auto font-mono text-xs"><div className="text-center mb-4">{settings.logo&&<img src={settings.logo} className="w-12 h-12 mx-auto mb-1 grayscale" />}<h2 className="font-bold text-sm uppercase">{settings.storeName}</h2><p>{settings.address}</p><p>{settings.phone}</p></div><div className="border-y border-dashed py-2 mb-2 space-y-1"><div className="flex justify-between"><span>No:</span><span>{data.id}</span></div><div className="flex justify-between"><span>Tgl:</span><span>{new Date(data.date).toLocaleDateString('id-ID')}</span></div><div className="flex justify-between"><span>Nama:</span><span className="font-bold">{data.customer}</span></div><div className="flex justify-between"><span>Status:</span><span className="font-bold">{data.status}</span></div></div><div className="space-y-1 mb-2">{data.items.map((i,x)=><div key={x}><div className="font-bold">{i.name}</div><div className="flex justify-between text-gray-600"><span>{i.qty} x {formatRupiah(i.price)}</span><span>{formatRupiah(i.price*i.qty)}</span></div></div>)}</div><div className="border-t border-dashed pt-2 flex justify-between font-bold text-sm"><span>TOTAL</span><span>{formatRupiah(data.total)}</span></div><div className="text-center mt-6 text-gray-500">*** TERIMA KASIH ***</div></div>
+                    <div id="receipt-content" className="p-6 overflow-y-auto font-mono text-xs"><div className="text-center mb-4">{settings.logo&&<img src={settings.logo} className="w-12 h-12 mx-auto mb-1 grayscale" />}<h2 className="font-bold text-sm uppercase">{settings.storeName}</h2><p>{settings.address}</p><p>{settings.phone}</p></div><div className="border-y border-dashed py-2 mb-2 space-y-1"><div className="flex justify-between"><span>No:</span><span>{data.id}</span></div><div className="flex justify-between"><span>Tanggal:</span><span>{new Date(data.date).toLocaleDateString('id-ID')}</span></div><div className="flex justify-between"><span>Nama:</span><span className="font-bold">{data.customer}</span></div><div className="flex justify-between"><span>Status:</span><span className="font-bold">{data.status}</span></div></div><div className="space-y-1 mb-2">{data.items.map((i,x)=><div key={x}><div className="font-bold">{i.name}</div><div className="flex justify-between text-gray-600"><span>{i.qty} x {formatRupiah(i.price)}</span><span>{formatRupiah(i.price*i.qty)}</span></div></div>)}</div><div className="border-t border-dashed pt-2 flex justify-between font-bold text-sm"><span>TOTAL</span><span>{formatRupiah(data.total)}</span></div><div className="text-center mt-6 text-gray-500">*** TERIMA KASIH ***</div></div>
                     <div className="p-3 bg-gray-50 grid grid-cols-2 gap-2 border-t print:hidden"><button onClick={handleWA} className="py-2 bg-green-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1"><Icon name="MessageCircle" size={14}/> WA</button><button onClick={handleBT} className="py-2 bg-indigo-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1"><Icon name="Bluetooth" size={14}/> BT Print</button><button onClick={()=>window.print()} className="py-2 bg-blue-600 text-white rounded font-bold text-xs flex items-center justify-center gap-1"><Icon name="Printer" size={14}/> Cetak</button><button onClick={onClose} className="py-2 bg-white text-gray-700 rounded border font-bold text-xs">Tutup</button></div>
                 </div><style dangerouslySetInnerHTML={{__html: `@media print { body * { visibility: hidden; } #receipt-content, #receipt-content * { visibility: visible; } #receipt-content { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; } }`}} /></div>
             );
