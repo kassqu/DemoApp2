@@ -35,7 +35,8 @@
         // ==========================================
         const DEV_COMPANY_LOGO = ""; // Kosongkan agar pakai desain logo KASSQU
         const SPLASH_BG_IMAGE = "https://static.vecteezy.com/system/resources/thumbnails/038/813/435/small/ai-generated-beautifulgraphy-for-laundry-advertising-free-photo.jpeg";
-        const LOGIN_BG_IMAGE = "https://img.freepik.com/premium-photo/concept-housework-with-washing-machine-blue-background_185193-66789.jpg";
+        // const LOGIN_BG_IMAGE = "https://img.freepik.com/premium-photo/concept-housework-with-washing-machine-blue-background_185193-66789.jpg";
+        const LOGIN_BG_IMAGE = "https://static.vecteezy.com/system/resources/thumbnails/038/813/435/small/ai-generated-beautifulgraphy-for-laundry-advertising-free-photo.jpeg";
 
         // PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxR1PppWpHWrvku-14G-vfYUAvTy13S8N69iZfjNfAhZKs2SHU3d6uQNjEJKm7aWlI/exec"; 
@@ -248,7 +249,7 @@
             if (showSplash) {
                 return (
                     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center text-white" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-none"></div>
+                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-none"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
                             
                             {/* Animasi loading muter */}
@@ -271,7 +272,7 @@
             if (!isLoggedIn) {
                 return (
                     <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/90 backdrop-blur-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-gray-900/50 backdrop-blur-none"></div>
                         <div className="relative z-10 bg-white/20 backdrop-blur-none p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
                             
                             {/* 3. UBAH HEADER LOGIN AGAR MENAMPILKAN LOGO & NAMA TOKO */}
