@@ -245,36 +245,36 @@
             const updateSettingsDb = async (newData) => { 
                 setSettings(newData); 
                 const res = await fetchFromGAS({ action: 'SAVE_SETTINGS', data: newData }); 
-                if (res && res.status === 'success') alert('Pengaturan toko berhasil disimpan ke GSheet!');
-                else alert('Gagal menyimpan Pengaturan: ' + (res?.message || 'Pastikan kolom receiptFooter sudah dibuat di GSheet!'));
+                if (res && res.status === 'success') alert('Pengaturan toko berhasil disimpan ke Database');
+                else alert('Gagal menyimpan Pengaturan: ' + (res?.message || 'Pastikan kolom receiptFooter sudah dibuat di Database'));
             };
 
             const saveProductDb = async (prod) => {
                 const newProds = products.find(p => p.id === prod.id) ? products.map(p => p.id === prod.id ? prod : p) : [...products, prod];
                 setProducts(newProds); 
                 const res = await fetchFromGAS({ action: 'SAVE_PRODUCT', data: prod }); 
-                if (res && res.status === 'success') alert('Produk/Layanan berhasil disimpan ke GSheet!');
+                if (res && res.status === 'success') alert('Produk/Layanan berhasil disimpan ke Database');
                 else alert('Gagal menyimpan Produk: ' + (res?.message || 'Cek koneksi/GAS_URL'));
             };
 
             const deleteProductDb = async (id) => { 
                 setProducts(products.filter(p => p.id !== id)); 
                 const res = await fetchFromGAS({ action: 'DELETE_PRODUCT', id: id }); 
-                if (res && res.status === 'success') alert('Produk terhapus di GSheet!');
+                if (res && res.status === 'success') alert('Produk terhapus di Database');
             };
 
             const saveTransactionDb = async (trx) => {
                 const newTrxs = transactions.find(t => t.id === trx.id) ? transactions.map(t => t.id === trx.id ? trx : t) : [...transactions, trx];
                 setTransactions(newTrxs); 
                 const res = await fetchFromGAS({ action: 'SAVE_TRANSACTION', data: trx }); 
-                if (res && res.status === 'success') alert('Transaksi berhasil disimpan ke GSheet!');
-                else alert('Gagal menyimpan Transaksi ke GSheet: ' + (res?.message || 'Pastikan GAS_URL benar dan Web App sudah di-deploy dengan opsi "Anyone"'));
+                if (res && res.status === 'success') alert('Transaksi berhasil disimpan ke Database');
+                else alert('Gagal menyimpan Transaksi ke Database: ' + (res?.message || 'Pastikan GAS_URL sudah benar'));
             };
 
             const deleteTransactionDb = async (id) => { 
                 setTransactions(transactions.filter(t => t.id !== id)); 
                 const res = await fetchFromGAS({ action: 'DELETE_TRANSACTION', id: id }); 
-                if (res && res.status === 'success') alert('Transaksi terhapus dari GSheet!');
+                if (res && res.status === 'success') alert('Transaksi terhapus dari Database');
             };
 
             const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
