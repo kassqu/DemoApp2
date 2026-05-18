@@ -33,9 +33,9 @@
         // ==========================================
         // 🔴 KONFIGURASI PENTING DEVELOPER 🔴
         // ==========================================
-        const DEV_COMPANY_LOGO = ""; // Kosongkan agar pakai desain KASSQU bawaan
-        const SPLASH_BG_IMAGE = "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&q=80&w=2000";
-        const LOGIN_BG_IMAGE = "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&q=80&w=2000";
+        const DEV_COMPANY_LOGO = ""; // Kosongkan agar pakai desain logo KASSQU
+        const SPLASH_BG_IMAGE = "https://static.vecteezy.com/system/resources/thumbnails/038/813/435/small/ai-generated-beautifulgraphy-for-laundry-advertising-free-photo.jpeg";
+        const LOGIN_BG_IMAGE = "https://img.freepik.com/premium-photo/concept-housework-with-washing-machine-blue-background_185193-66789.jpg";
 
         // PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxR1PppWpHWrvku-14G-vfYUAvTy13S8N69iZfjNfAhZKs2SHU3d6uQNjEJKm7aWlI/exec"; 
@@ -172,10 +172,10 @@
                     }
                 };
 
-                // Loading muter min. 2 detik, sambil nunggu data dari GSheet selesai ditarik
+                // Loading muter min. 3 detik, sambil nunggu data dari GSheet selesai ditarik
                 Promise.all([
                     loadInitialData(),
-                    new Promise(resolve => setTimeout(resolve, 2000))
+                    new Promise(resolve => setTimeout(resolve, 3000))
                 ]).then(() => {
                     if (isMounted) setShowSplash(false);
                 });
@@ -248,7 +248,7 @@
             if (showSplash) {
                 return (
                     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center text-white" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-md"></div>
+                        <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-none"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
                             
                             {/* Animasi loading muter */}
@@ -256,7 +256,7 @@
 
                             <div className="flex items-center gap-3 animate-fade-in">
                                 <div className="w-16 h-16 flex items-center justify-center shrink-0 drop-shadow-xl">
-                                    {/* Gunakan gambar logo asli dari repository GitHub lu */}
+                                    {/* Gunakan gambar logo asli dari repository */}
                                     <img src="logo KassQu.png" alt="KassQu Logo" className="w-full h-full object-contain rounded-[1.1rem]" />
                                 </div>
                                 <h1 className="text-4xl font-black tracking-widest drop-shadow-md" style={{ fontFamily: 'Tahoma, sans-serif' }}>KASSQU</h1>
@@ -272,7 +272,7 @@
                 return (
                     <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/90 backdrop-blur-sm"></div>
-                        <div className="relative z-10 bg-white/20 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
+                        <div className="relative z-10 bg-white/20 backdrop-blur-none p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
                             
                             {/* 3. UBAH HEADER LOGIN AGAR MENAMPILKAN LOGO & NAMA TOKO */}
                             <div className="text-center mb-6 flex flex-col items-center">
@@ -477,7 +477,7 @@
                         <div><label className="text-sm font-medium">Nama Toko</label><input type="text" required value={formData.storeName || ''} onChange={e=>setFormData({...formData, storeName:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">Alamat</label><textarea required rows="2" value={formData.address || ''} onChange={e=>setFormData({...formData, address:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">No Telp</label><input type="text" required value={formData.phone || ''} onChange={e=>setFormData({...formData, phone:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
-                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Untuk pembuatan/perubahan akun & PIN/Password baru, Anda dapat menghubungi KassQu Dev.".</p></div></div></div>
+                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Untuk pembuatan/perubahan akun & PIN/Password baru, Anda dapat menghubungi KassQu Dev.</p></div></div></div>
                         <div className="flex justify-between items-center pt-2">{saved?<span className="text-green-600 text-sm font-bold">Tersimpan!</span>:<span></span>}<button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Simpan Info Toko</button></div>
                     </form></div>
                 </div>
