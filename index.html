@@ -216,7 +216,7 @@
                 const inputUser = e.target.username.value;
                 const inputPass = e.target.password.value;
                 
-                setLoginError('Mengecek kredensial ke server...');
+                setLoginError('Masuk ke aplikasi...');
                 setIsDbLoading(true);
                 const res = await fetchFromGAS({ action: 'GET_DATA' });
                 setIsDbLoading(false);
