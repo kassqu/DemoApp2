@@ -5,41 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KassQu</title>
     
-    <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#2563eb" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="logo-gw.png" />
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM Standalone -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel (Untuk menerjemahkan React JSX langsung di Browser) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800">
-    <!-- Wadah Aplikasi -->
     <div id="root"></div>
 
-    <!-- Kode Utama Aplikasi -->
     <script type="text/babel">
         const { useState, useEffect } = React;
 
         // ==========================================
         // 🔴 KONFIGURASI PENTING DEVELOPER 🔴
         // ==========================================
-        const DEV_COMPANY_LOGO = ""; // Kosongkan agar pakai desain logo KASSQU
+        const DEV_COMPANY_LOGO = ""; // Kosongkan agar pakai desain KASSQU bawaan
         const SPLASH_BG_IMAGE = "https://static.vecteezy.com/system/resources/thumbnails/038/813/435/small/ai-generated-beautifulgraphy-for-laundry-advertising-free-photo.jpeg";
-        const LOGIN_BG_IMAGE = "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI0LTAzL2FuZ3VzdGVvd19waG90b19vZl9jbG90aGVzX3dhc2hpbmdfbWFjaGluZV9pbl9taW5pbWFsX2xhdW5kcnlfYl8wYTg4MjY5ZC04NTRhLTQ5ODUtYTQ4ZC1lNGUzZDdmYzMyMDJfMS5qcGc.jpg";
+        const LOGIN_BG_IMAGE = "https://img.freepik.com/premium-photo/concept-housework-with-washing-machine-blue-background_185193-66789.jpg";
 
         // PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxR1PppWpHWrvku-14G-vfYUAvTy13S8N69iZfjNfAhZKs2SHU3d6uQNjEJKm7aWlI/exec"; 
+        const GAS_URL = "PASTE_KODE_LU_DISINI"; 
         // ==========================================
+
+        // --- UTUTLITAS FORMATTER UNTUK INPUT ---
+        const formatThousand = (val) => {
+            if (val === undefined || val === null || val === '') return '';
+            const num = val.toString().replace(/[^0-9]/g, '');
+            return num ? new Intl.NumberFormat('id-ID').format(num) : '';
+        };
+
+        const parseThousand = (val) => {
+            if (!val) return 0;
+            return Number(val.toString().replace(/[^0-9]/g, ''));
+        };
 
         // --- SISTEM ICON INTERNAL ---
         const icons = {
@@ -65,7 +71,6 @@
             Calculator: <><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></>,
             UserCircle: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></>,
             AlertTriangle: <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
-            // Ikon point_of_sale (Mesin Kasir / POS)
             point_of_sale: <><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M4 10h16"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/><line x1="8" y1="17" x2="8.01" y2="17"/><line x1="12" y1="17" x2="12.01" y2="17"/><line x1="16" y1="17" x2="16.01" y2="17"/></>
         };
 
@@ -127,13 +132,11 @@
             const [loginError, setLoginError] = useState('');
             const [editingTrx, setEditingTrx] = useState(null);
 
-            // 1. KITA PINDAHKAN FUNGSI FETCH KE ATAS AGAR BISA MENGAMBIL DATA SAAT SPLASH SCREEN
             const fetchFromGAS = async (payload) => {
                 try {
-                    // Cek jika GAS_URL belum diatur/diubah dari nilai default untuk mencegah native fetch error
                     if (!GAS_URL.startsWith('http')) {
-                        console.warn("Harap masukkan GAS_URL yang valid (dimulai dengan http/https).");
-                        return { status: 'error', message: 'GAS_URL belum disetting. Silakan edit kode dan masukkan URL Apps Script yang valid.' };
+                        console.warn("Harap masukkan GAS_URL yang valid.");
+                        return { status: 'error', message: 'GAS_URL belum dikonfigurasi dengan tautan Apps Script.' };
                     }
                     
                     const response = await fetch(GAS_URL, { 
@@ -145,18 +148,16 @@
                     return await response.json();
                 } catch (error) {
                     console.error("GAS Error:", error);
-                    return { status: 'error', message: 'Koneksi terputus atau URL tidak valid. Pastikan link GAS URL benar.' };
+                    return { status: 'error', message: 'Gagal koneksi ke server database.' };
                 }
             };
 
-            // 2. UBAH USEEFFECT UNTUK MEMUAT DATA TOKO SECARA OTOMATIS SAAT LOADING AWAL
             useEffect(() => {
                 let isMounted = true;
                 const loadInitialData = async () => {
                     try {
                         const res = await fetchFromGAS({ action: 'GET_DATA' });
                         if (isMounted && res.status === 'success') {
-                            // Pasang data Setting Toko sebelum masuk ke Login Screen
                             if (res.data.settings && Object.keys(res.data.settings).length > 0) {
                                 setSettings({ ...INITIAL_SETTINGS, ...res.data.settings });
                             }
@@ -172,10 +173,9 @@
                     }
                 };
 
-                // Loading muter min. 3 detik, sambil nunggu data dari GSheet selesai ditarik
                 Promise.all([
                     loadInitialData(),
-                    new Promise(resolve => setTimeout(resolve, 3000))
+                    new Promise(resolve => setTimeout(resolve, 2000))
                 ]).then(() => {
                     if (isMounted) setShowSplash(false);
                 });
@@ -210,8 +210,6 @@
 
                     if (validUser) {
                         setCurrentUser(validUser);
-                        
-                        // PERBAIKAN: Perlindungan Data (Defensive Data Binding)
                         if (res.data.settings && Object.keys(res.data.settings).length > 0) {
                             setSettings({ ...INITIAL_SETTINGS, ...res.data.settings });
                         }
@@ -221,7 +219,6 @@
                         if (res.data.transactions && Array.isArray(res.data.transactions)) {
                             setTransactions(res.data.transactions);
                         }
-                        
                         setIsLoggedIn(true); 
                         setLoginError('');
                     } else {
@@ -232,31 +229,54 @@
                 }
             };
 
-            const updateSettingsDb = async (newData) => { setSettings(newData); await fetchFromGAS({ action: 'SAVE_SETTINGS', data: newData }); };
+            // REWRITE: Ditambahkan alert status feedback simpan ke Google Sheet
+            const updateSettingsDb = async (newData) => { 
+                setSettings(newData); 
+                const res = await fetchFromGAS({ action: 'SAVE_SETTINGS', data: newData }); 
+                if (res && res.status === 'success') alert('Pengaturan toko berhasil disimpan ke GSheet!');
+                else alert('Gagal menyimpan Pengaturan: ' + (res?.message || 'Cek koneksi/GAS_URL'));
+            };
+
             const saveProductDb = async (prod) => {
                 const newProds = products.find(p => p.id === prod.id) ? products.map(p => p.id === prod.id ? prod : p) : [...products, prod];
-                setProducts(newProds); await fetchFromGAS({ action: 'SAVE_PRODUCT', data: prod });
+                setProducts(newProds); 
+                const res = await fetchFromGAS({ action: 'SAVE_PRODUCT', data: prod }); 
+                if (res && res.status === 'success') alert('Produk/Layanan berhasil disimpan ke GSheet!');
+                else alert('Gagal menyimpan Produk: ' + (res?.message || 'Cek koneksi/GAS_URL'));
             };
-            const deleteProductDb = async (id) => { setProducts(products.filter(p => p.id !== id)); await fetchFromGAS({ action: 'DELETE_PRODUCT', id: id }); };
+
+            const deleteProductDb = async (id) => { 
+                setProducts(products.filter(p => p.id !== id)); 
+                const res = await fetchFromGAS({ action: 'DELETE_PRODUCT', id: id }); 
+                if (res && res.status === 'success') alert('Produk terhapus di GSheet!');
+            };
+
             const saveTransactionDb = async (trx) => {
                 const newTrxs = transactions.find(t => t.id === trx.id) ? transactions.map(t => t.id === trx.id ? trx : t) : [...transactions, trx];
-                setTransactions(newTrxs); await fetchFromGAS({ action: 'SAVE_TRANSACTION', data: trx });
+                setTransactions(newTrxs); 
+                const res = await fetchFromGAS({ action: 'SAVE_TRANSACTION', data: trx }); 
+                if (res && res.status === 'success') alert('Transaksi berhasil disimpan ke GSheet!');
+                else alert('Gagal menyimpan Transaksi ke GSheet: ' + (res?.message || 'Pastikan GAS_URL benar dan Web App sudah di-deploy dengan opsi "Anyone"'));
             };
-            const deleteTransactionDb = async (id) => { setTransactions(transactions.filter(t => t.id !== id)); await fetchFromGAS({ action: 'DELETE_TRANSACTION', id: id }); };
+
+            const deleteTransactionDb = async (id) => { 
+                setTransactions(transactions.filter(t => t.id !== id)); 
+                const res = await fetchFromGAS({ action: 'DELETE_TRANSACTION', id: id }); 
+                if (res && res.status === 'success') alert('Transaksi terhapus dari GSheet!');
+            };
+
             const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 
             if (showSplash) {
                 return (
                     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center text-white" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[4px]"></div>
+                        <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-[4px]"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
                             
-                            {/* Animasi loading muter */}
                             <div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-8 drop-shadow-md"></div>
 
                             <div className="flex items-center gap-3 animate-fade-in">
                                 <div className="w-16 h-16 flex items-center justify-center shrink-0 drop-shadow-xl">
-                                    {/* Gunakan gambar logo asli dari repository */}
                                     <img src="logo KassQu.png" alt="KassQu Logo" className="w-full h-full object-contain rounded-[1.1rem]" />
                                 </div>
                                 <h1 className="text-4xl font-black tracking-widest drop-shadow-md" style={{ fontFamily: 'Tahoma, sans-serif' }}>KASSQU</h1>
@@ -271,10 +291,9 @@
             if (!isLoggedIn) {
                 return (
                     <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-gray-900/50 backdrop-blur-[2px]"></div>
+                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/90 backdrop-blur-[2px]"></div>
                         <div className="relative z-10 bg-white/20 backdrop-blur-[2px] p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
                             
-                            {/* 3. UBAH HEADER LOGIN AGAR MENAMPILKAN LOGO & NAMA TOKO */}
                             <div className="text-center mb-6 flex flex-col items-center">
                                 {settings?.logo ? (
                                     <img src={settings.logo} alt="Logo Toko" className="w-20 h-20 object-cover rounded-2xl mb-4 shadow-lg border-2 border-white/20" />
@@ -289,10 +308,10 @@
 
                             {loginError && <div className="mb-4 p-3 bg-red-100/90 text-red-700 rounded-lg text-sm font-bold flex justify-center text-center gap-2 border border-red-200"><Icon name="XCircle" size={16} className="shrink-0 mt-0.5" /> <span>{loginError}</span></div>}
                             <form onSubmit={handleLogin} className="space-y-4">
-                                <input type="text" name="username" placeholder="Masukkan Kode Akses" required className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-blue-400 outline-none bg-white/90 text-gray-800" />
-                                <input type="password" name="password" placeholder="Masukkan PIN" required className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-blue-400 outline-none bg-white/90 text-gray-800" />
+                                <input type="text" name="username" placeholder="Kode Kasir (Contoh: admin)" required className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-blue-400 outline-none bg-white/90 text-gray-800" />
+                                <input type="password" name="password" placeholder="PIN Kasir" required className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-blue-400 outline-none bg-white/90 text-gray-800" />
                                 <button type="submit" disabled={isDbLoading} className="w-full bg-gradient-to-r from-blue-600 to-blue-700 disabled:opacity-70 text-white font-bold py-3 rounded-xl shadow-lg border border-blue-500">{isDbLoading ? 'Memproses...' : 'Masuk Aplikasi'}</button>
-                                <div className="pt-3 text-center"><p className="text-xs text-white/50 font-medium">Hubungi Pemilik/Owner jika Anda lupa PIN.</p></div>
+                                <div className="pt-3 text-center"><p className="text-xs text-white/50 font-medium">Hubungi Pemilik Toko/Admin KassQu jika Anda lupa PIN.</p></div>
                             </form>
                         </div>
                     </div>
@@ -340,15 +359,35 @@
         function ProdukView({ products, onSaveProduct, onDeleteProduct, formatRupiah, searchQuery, compressImage }) {
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [editingProduct, setEditingProduct] = useState(null);
-            const [name, setName] = useState(''); const [price, setPrice] = useState(''); const [unit, setUnit] = useState('Kg'); const [category, setCategory] = useState('Kiloan'); const [image, setImage] = useState(null);
+            const [name, setName] = useState(''); 
+            const [price, setPrice] = useState(''); // REWRITE: Disimpan sebagai string berformat titik
+            const [unit, setUnit] = useState('Kg'); 
+            const [category, setCategory] = useState('Kiloan'); 
+            const [image, setImage] = useState(null);
+
             const filteredProducts = products.filter(p => (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
             const handleImageUpload = async (e) => { if (e.target.files[0]) setImage(await compressImage(e.target.files[0])); };
+            
             const openModal = (product = null) => {
-                if (product) { setEditingProduct(product); setName(product.name); setPrice(product.price); setUnit(product.unit); setCategory(product.category); setImage(product.image); } 
-                else { setEditingProduct(null); setName(''); setPrice(''); setUnit('Kg'); setCategory('Kiloan'); setImage(null); }
+                if (product) { 
+                    setEditingProduct(product); 
+                    setName(product.name); 
+                    setPrice(formatThousand(product.price)); // Auto format saat load data edit
+                    setUnit(product.unit); 
+                    setCategory(product.category); 
+                    setImage(product.image); 
+                } else { 
+                    setEditingProduct(null); setName(''); setPrice(''); setUnit('Kg'); setCategory('Kiloan'); setImage(null); 
+                }
                 setIsModalOpen(true);
             };
-            const saveProduct = (e) => { e.preventDefault(); onSaveProduct({ id: editingProduct ? editingProduct.id : Date.now(), name, price: Number(price), unit, category, image }); setIsModalOpen(false); };
+
+            const saveProduct = (e) => { 
+                e.preventDefault(); 
+                // PARSE: Mengembalikan string bertitik kembali jadi angka murni saat disimpan ke DB
+                onSaveProduct({ id: editingProduct ? editingProduct.id : Date.now(), name, price: parseThousand(price), unit, category, image }); 
+                setIsModalOpen(false); 
+            };
 
             return (
                 <div className="space-y-4 animate-in fade-in duration-500">
@@ -367,7 +406,11 @@
                                 <div className="p-6 border-b border-gray-100"><h3 className="text-xl font-bold text-gray-800">{editingProduct ? 'Edit Layanan' : 'Tambah Layanan Baru'}</h3></div>
                                 <form onSubmit={saveProduct} className="p-6 space-y-4">
                                     <div><label className="block text-sm font-medium mb-1">Nama Layanan</label><input type="text" required value={name} onChange={e=>setName(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-                                    <div className="grid grid-cols-2 gap-4"><div><label className="block text-sm font-medium mb-1">Harga</label><input type="number" required value={price} onChange={e=>setPrice(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" /></div><div><label className="block text-sm font-medium mb-1">Satuan</label><select value={unit} onChange={e=>setUnit(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="Kg">Kg</option><option value="Pcs">Pcs</option><option value="Psg">Pasang</option><option value="Meter">Meter</option></select></div></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* FIX: Mengubah input menjadi type="text" dengan auto format ribuan ber-titik */}
+                                        <div><label className="block text-sm font-medium mb-1">Harga (Rp)</label><input type="text" required value={price} onChange={e=>setPrice(formatThousand(e.target.value))} placeholder="Contoh: 50.000" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold" /></div>
+                                        <div><label className="block text-sm font-medium mb-1">Satuan</label><select value={unit} onChange={e=>setUnit(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="Kg">Kg</option><option value="Pcs">Pcs</option><option value="Psg">Pasang</option><option value="Meter">Meter</option></select></div>
+                                    </div>
                                     <div><label className="block text-sm font-medium mb-1">Kategori</label><select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="Kiloan">Kiloan</option><option value="Satuan">Satuan</option><option value="Sepatu">Sepatu/Tas</option></select></div>
                                     <div><label className="block text-sm font-medium mb-1">Foto Layanan</label><div className="flex items-center gap-4">{image && <img src={image} className="w-16 h-16 rounded object-cover" />}<input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm" /></div></div>
                                     <div className="flex gap-3 pt-4"><button type="button" onClick={()=>setIsModalOpen(false)} className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg">Batal</button><button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg">Simpan</button></div>
@@ -477,7 +520,7 @@
                         <div><label className="text-sm font-medium">Nama Toko</label><input type="text" required value={formData.storeName || ''} onChange={e=>setFormData({...formData, storeName:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">Alamat</label><textarea required rows="2" value={formData.address || ''} onChange={e=>setFormData({...formData, address:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">No Telp</label><input type="text" required value={formData.phone || ''} onChange={e=>setFormData({...formData, phone:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
-                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Untuk pembuatan/perubahan akun & PIN/Password baru, Anda dapat menghubungi KassQu Dev.</p></div></div></div>
+                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun Kasir & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Pembuatan akun baru dan perubahan PIN/Password silakan hubungi Admin KassQu. Terima kasih</p></div></div></div>
                         <div className="flex justify-between items-center pt-2">{saved?<span className="text-green-600 text-sm font-bold">Tersimpan!</span>:<span></span>}<button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Simpan Info Toko</button></div>
                     </form></div>
                 </div>
@@ -554,7 +597,6 @@
             return (<button onClick={onClick} className={`flex flex-col items-center justify-center w-16 transition-colors ${isActive ? 'text-blue-600' : 'text-gray-400'}`}><div className={`${isActive ? 'scale-110 mb-1' : 'scale-100 mb-0'}`}>{icon}</div><span className={`text-[10px] font-medium ${isActive ? 'opacity-100' : 'opacity-0 h-0'}`}>{label}</span></button>);
         }
 
-        // Render Aplikasi
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
