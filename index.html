@@ -722,13 +722,37 @@
         }
 
         function LaporanView({ transactions, onDeleteTransaction, onUpdateTransaction, formatRupiah, searchQuery, onLoadToKasir, settings }) {
-            const [startDate, setStartDate] = useState(''); const [endDate, setEndDate] = useState('');
+            const [filterPreset, setFilterPreset] = useState('semua');
+            const [startDate, setStartDate] = useState(''); 
+            const [endDate, setEndDate] = useState('');
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             const filteredTrx = transactions.filter(t => {
                 const matchSearch = (t.id || '').toLowerCase().includes(searchQuery.toLowerCase()) || (t.customer || '').toLowerCase().includes(searchQuery.toLowerCase());
                 if (!matchSearch) return false;
+                
                 const d = t.date ? new Date(t.date) : new Date(); 
-                if (startDate && d < new Date(startDate)) return false; 
-                if (endDate && d > new Date(endDate+"T23:59:59")) return false;
+                
+                if (filterPreset === 'hari-ini') {
+                    const dDate = new Date(d);
+                    dDate.setHours(0, 0, 0, 0);
+                    return dDate.getTime() === today.getTime();
+                } else if (filterPreset === 'mingguan') {
+                    const lastWeek = new Date(today);
+                    lastWeek.setDate(today.getDate() - 7);
+                    return d >= lastWeek;
+                } else if (filterPreset === 'bulanan') {
+                    const lastMonth = new Date(today);
+                    lastMonth.setDate(today.getDate() - 30);
+                    return d >= lastMonth;
+                } else if (filterPreset === 'kalender') {
+                    if (startDate && d < new Date(startDate)) return false; 
+                    if (endDate && d > new Date(endDate+"T23:59:59")) return false;
+                    return true;
+                }
+                
                 return true;
             }).sort((a,b) => new Date(b.date || Date.now()) - new Date(a.date || Date.now()));
             
@@ -745,7 +769,35 @@
             return (
                 <div className="space-y-4 animate-in fade-in">
                     <div className="flex justify-between items-center print:hidden"><h2 className="text-xl font-bold text-gray-800">Laporan Keuangan</h2><button onClick={()=>window.print()} className="bg-green-600 text-white px-3 py-1.5 rounded flex items-center gap-1 text-sm"><Icon name="Download" size={14}/> Cetak PDF</button></div>
-                    <div className="bg-white p-3 rounded-lg shadow-sm border flex gap-3 print:hidden text-sm"><input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} className="border rounded px-2 py-1 outline-none text-gray-800" /><input type="date" value={endDate} onChange={e=>setEndDate(e.target.value)} className="border rounded px-2 py-1 outline-none text-gray-800" />{(startDate||endDate)&&<button onClick={()=>{setStartDate('');setEndDate('');}} className="text-xs text-red-500 hover:underline">Reset</button>}</div>
+                    
+                    <div className="bg-white p-3 rounded-xl shadow-sm border flex flex-col gap-3 print:hidden text-sm">
+                        <div className="flex items-center gap-2">
+                            <span className="text-gray-600 font-medium whitespace-nowrap">Pilih Laporan:</span>
+                            <select 
+                                value={filterPreset} 
+                                onChange={e => {
+                                    setFilterPreset(e.target.value);
+                                    if(e.target.value !== 'kalender') { setStartDate(''); setEndDate(''); }
+                                }}
+                                className="border rounded-lg px-3 py-2 outline-none bg-gray-50 flex-1 font-bold text-gray-800 focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="semua">Semua Waktu</option>
+                                <option value="hari-ini">Hari Ini</option>
+                                <option value="mingguan">Mingguan (7 Hari Terakhir)</option>
+                                <option value="bulanan">Bulanan (30 Hari Terakhir)</option>
+                                <option value="kalender">Pilih Tanggal (Kalender)</option>
+                            </select>
+                        </div>
+                        
+                        {filterPreset === 'kalender' && (
+                            <div className="flex gap-2 items-center pt-2 border-t mt-1 animate-in fade-in slide-in-from-top-2">
+                                <input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} className="border rounded-lg px-2 py-1.5 outline-none text-gray-800 flex-1" />
+                                <span className="text-gray-400">-</span>
+                                <input type="date" value={endDate} onChange={e=>setEndDate(e.target.value)} className="border rounded-lg px-2 py-1.5 outline-none text-gray-800 flex-1" />
+                                {(startDate||endDate)&&<button onClick={()=>{setStartDate('');setEndDate('');}} className="text-xs text-red-500 hover:underline font-bold px-1">Reset</button>}
+                            </div>
+                        )}
+                    </div>
                     
                     <div className="grid grid-cols-3 gap-3 print:hidden mb-4">
                         <div className="bg-white border rounded-xl p-3 shadow-sm text-center">
