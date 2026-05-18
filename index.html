@@ -284,7 +284,7 @@
             if (showSplash) {
                 return (
                     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center text-white" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-md"></div>
+                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[4px]"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
                             
                             <div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-8 drop-shadow-md"></div>
@@ -305,8 +305,8 @@
             if (!isLoggedIn) {
                 return (
                     <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-900/90 backdrop-blur-sm"></div>
-                        <div className="relative z-10 bg-white/20 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
+                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-gray-900/50 backdrop-blur-[2px]"></div>
+                        <div className="relative z-10 bg-white/20 backdrop-blur-[2px] p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
                             
                             <div className="text-center mb-6 flex flex-col items-center">
                                 {settings?.logo ? (
