@@ -87,7 +87,8 @@
             storeName: 'Laundry Clean & Fresh',
             address: 'Jl. Merdeka No. 123, Jakarta',
             phone: '0812-3456-7890',
-            logo: null
+            logo: null,
+            receiptFooter: '*** TERIMA KASIH ***' // <-- Tambahan default buat Pesan Struk
         };
 
         const INITIAL_PRODUCTS = [
@@ -123,7 +124,6 @@
             const [showSplash, setShowSplash] = useState(true);
             const [isDbLoading, setIsDbLoading] = useState(false);
             
-            // 🔴 PERBAIKAN: Tarik status Login dari LocalStorage 🔴
             const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('kassqu_user') !== null);
             const [currentUser, setCurrentUser] = useState(() => {
                 const saved = localStorage.getItem('kassqu_user');
@@ -139,7 +139,6 @@
             const [loginError, setLoginError] = useState('');
             const [editingTrx, setEditingTrx] = useState(null);
 
-            // Simpan Tab Terakhir ke memory setiap kali berubah
             useEffect(() => {
                 localStorage.setItem('kassqu_tab', activeTab);
             }, [activeTab]);
@@ -222,7 +221,6 @@
 
                     if (validUser) {
                         setCurrentUser(validUser);
-                        // 🔴 SIMPAN SESI LOGIN KE LOCALSTORAGE BROWSER 🔴
                         localStorage.setItem('kassqu_user', JSON.stringify(validUser));
                         
                         if (res.data.settings && Object.keys(res.data.settings).length > 0) {
@@ -248,7 +246,7 @@
                 setSettings(newData); 
                 const res = await fetchFromGAS({ action: 'SAVE_SETTINGS', data: newData }); 
                 if (res && res.status === 'success') alert('Pengaturan toko berhasil disimpan ke GSheet!');
-                else alert('Gagal menyimpan Pengaturan: ' + (res?.message || 'Cek koneksi/GAS_URL'));
+                else alert('Gagal menyimpan Pengaturan: ' + (res?.message || 'Pastikan kolom receiptFooter sudah dibuat di GSheet!'));
             };
 
             const saveProductDb = async (prod) => {
@@ -345,13 +343,12 @@
                                 <input type="text" placeholder="Cari transaksi, produk..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"/>
                             </div>
                             
-                            {/* 🔴 TOMBOL LOGOUT SEKALIGUS HAPUS MEMORI BROWSER 🔴 */}
                             <button onClick={() => { 
                                 setIsLoggedIn(false); 
                                 setCurrentUser(null); 
                                 localStorage.removeItem('kassqu_user');
                                 localStorage.removeItem('kassqu_tab');
-                                setActiveTab('dashboard'); // Balik ke dashboard pas login lagi
+                                setActiveTab('dashboard'); 
                             }} className="text-gray-500 hover:text-red-500 transition-colors p-2 flex items-center gap-1 text-sm font-medium">
                                 <Icon name="LogOut" size={20} /> <span className="hidden sm:inline">Keluar</span>
                             </button>
@@ -542,8 +539,17 @@
                         <div><label className="text-sm font-medium">Nama Toko</label><input type="text" required value={formData.storeName || ''} onChange={e=>setFormData({...formData, storeName:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">Alamat</label><textarea required rows="2" value={formData.address || ''} onChange={e=>setFormData({...formData, address:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
                         <div><label className="text-sm font-medium">No Telp</label><input type="text" required value={formData.phone || ''} onChange={e=>setFormData({...formData, phone:e.target.value})} className="w-full px-3 py-2 border rounded outline-none"/></div>
-                        <div className="pt-4 border-t bg-blue-50 p-3 rounded-lg border border-blue-100"><div className="flex items-start gap-2 text-blue-800"><Icon name="UserCircle" className="shrink-0 mt-0.5" size={18} /><div><h3 className="font-bold text-sm">Manajemen Akun Kasir & Keamanan</h3><p className="text-xs text-blue-700/80 mt-1 leading-relaxed">Pembuatan akun baru, ganti nama kasir, dan perubahan PIN / Password sekarang dilakukan langsung melalui File Google Sheets Anda di tab "Staff".</p></div></div></div>
-                        <div className="flex justify-between items-center pt-2">{saved?<span className="text-green-600 text-sm font-bold">Tersimpan!</span>:<span></span>}<button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Simpan Info Toko</button></div>
+                        
+                        {/* 🔴 PERUBAHAN: Input Footer Struk menggantikan Warning Box Lama */}
+                        <div className="pt-2">
+                            <label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1">
+                                <Icon name="Printer" size={16} className="text-blue-500" /> Pesan Bawah Struk (Footer)
+                            </label>
+                            <input type="text" value={formData.receiptFooter || ''} onChange={e=>setFormData({...formData, receiptFooter:e.target.value})} placeholder="Contoh: Terima kasih, sukses selalu!" className="w-full px-3 py-2 border rounded outline-none bg-blue-50/30 focus:bg-white focus:ring-2 focus:ring-blue-500"/>
+                            <p className="text-[10px] text-gray-500 mt-1">Pesan ini akan otomatis dicetak di bagian paling bawah struk dan dikirim ke WA.</p>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-2 border-t mt-2">{saved?<span className="text-green-600 text-sm font-bold">Tersimpan!</span>:<span></span>}<button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Simpan Info Toko</button></div>
                     </form></div>
                 </div>
             );
@@ -605,11 +611,19 @@
         }
 
         function ReceiptModal({ data, settings, onClose, formatRupiah }) {
-            const handleWA = () => { if(data.customerPhone) window.open(`https://wa.me/${data.customerPhone.startsWith('0')?'62'+data.customerPhone.slice(1):data.customerPhone}?text=${encodeURIComponent(`Halo *${data.customer || 'Pelanggan'}*,\nPesanan dari *${settings?.storeName || 'Toko'}*:\nID: *${data.id}*\nTotal: *${formatRupiah(data.total || 0)}*\nStatus: *${data.status || '-'}*\nAmbil: ${data.pickupDate||'-'}\nTerima kasih!`)}`,'_blank'); };
+            const handleWA = () => { if(data.customerPhone) window.open(`https://wa.me/${data.customerPhone.startsWith('0')?'62'+data.customerPhone.slice(1):data.customerPhone}?text=${encodeURIComponent(`Halo *${data.customer || 'Pelanggan'}*,\nPesanan dari *${settings?.storeName || 'Toko'}*:\nID: *${data.id}*\nTotal: *${formatRupiah(data.total || 0)}*\nStatus: *${data.status || '-'}*\nAmbil: ${data.pickupDate||'-'}\n\n_${settings?.receiptFooter || '*** TERIMA KASIH ***'}_`)}`,'_blank'); };
             const handleBT = async () => { alert("Sambungkan printer dari Bluetooth settings HP lalu klik Cetak PDF jika menggunakan PrintShare/sejenisnya, atau gunakan browser Chrome Android untuk fitur ini."); };
             return (
                 <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-xl w-full max-w-sm flex flex-col max-h-[85vh]">
-                    <div id="receipt-content" className="p-6 overflow-y-auto font-mono text-xs"><div className="text-center mb-4">{settings?.logo&&<img src={settings.logo} className="w-12 h-12 mx-auto mb-1 grayscale" />}<h2 className="font-bold text-sm uppercase">{settings?.storeName || 'Toko Kasir'}</h2><p>{settings?.address || ''}</p><p>{settings?.phone || ''}</p></div><div className="border-y border-dashed py-2 mb-2 space-y-1"><div className="flex justify-between"><span>No:</span><span>{data.id}</span></div><div className="flex justify-between"><span>Tanggal:</span><span>{data.date ? new Date(data.date).toLocaleDateString('id-ID') : '-'}</span></div><div className="flex justify-between"><span>Nama:</span><span className="font-bold">{data.customer || 'Pelanggan'}</span></div><div className="flex justify-between"><span>Status:</span><span className="font-bold">{data.status || '-'}</span></div></div><div className="space-y-1 mb-2">{(data.items || []).map((i,x)=><div key={x}><div className="font-bold">{i.name}</div><div className="flex justify-between text-gray-600"><span>{i.qty} x {formatRupiah(i.price)}</span><span>{formatRupiah(i.price*i.qty)}</span></div></div>)}</div><div className="border-t border-dashed pt-2 flex justify-between font-bold text-sm"><span>TOTAL</span><span>{formatRupiah(data.total || 0)}</span></div><div className="text-center mt-6 text-gray-500">*** TERIMA KASIH ***</div></div>
+                    <div id="receipt-content" className="p-6 overflow-y-auto font-mono text-xs">
+                        <div className="text-center mb-4">{settings?.logo&&<img src={settings.logo} className="w-12 h-12 mx-auto mb-1 grayscale" />}<h2 className="font-bold text-sm uppercase">{settings?.storeName || 'Toko Kasir'}</h2><p>{settings?.address || ''}</p><p>{settings?.phone || ''}</p></div>
+                        <div className="border-y border-dashed py-2 mb-2 space-y-1"><div className="flex justify-between"><span>No:</span><span>{data.id}</span></div><div className="flex justify-between"><span>Tanggal:</span><span>{data.date ? new Date(data.date).toLocaleDateString('id-ID') : '-'}</span></div><div className="flex justify-between"><span>Nama:</span><span className="font-bold">{data.customer || 'Pelanggan'}</span></div><div className="flex justify-between"><span>Status:</span><span className="font-bold">{data.status || '-'}</span></div></div>
+                        <div className="space-y-1 mb-2">{(data.items || []).map((i,x)=><div key={x}><div className="font-bold">{i.name}</div><div className="flex justify-between text-gray-600"><span>{i.qty} x {formatRupiah(i.price)}</span><span>{formatRupiah(i.price*i.qty)}</span></div></div>)}</div>
+                        <div className="border-t border-dashed pt-2 flex justify-between font-bold text-sm"><span>TOTAL</span><span>{formatRupiah(data.total || 0)}</span></div>
+                        
+                        {/* 🔴 PERUBAHAN: Footer Teks custom */}
+                        <div className="text-center mt-6 text-gray-500 whitespace-pre-wrap">{settings?.receiptFooter || '*** TERIMA KASIH ***'}</div>
+                    </div>
                     <div className="p-3 bg-gray-50 grid grid-cols-2 gap-2 border-t print:hidden"><button onClick={handleWA} className="py-2 bg-green-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1"><Icon name="MessageCircle" size={14}/> WA</button><button onClick={handleBT} className="py-2 bg-indigo-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1"><Icon name="Bluetooth" size={14}/> BT Print</button><button onClick={()=>window.print()} className="py-2 bg-blue-600 text-white rounded font-bold text-xs flex items-center justify-center gap-1"><Icon name="Printer" size={14}/> Cetak</button><button onClick={onClose} className="py-2 bg-white text-gray-700 rounded border font-bold text-xs">Tutup</button></div>
                 </div><style dangerouslySetInnerHTML={{__html: `@media print { body * { visibility: hidden; } #receipt-content, #receipt-content * { visibility: visible; } #receipt-content { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; } }`}} /></div>
             );
