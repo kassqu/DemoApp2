@@ -724,7 +724,7 @@
                         <div className={`fixed inset-0 z-40 bg-gray-50 flex flex-col md:static md:z-auto md:bg-white md:w-[340px] md:shadow-lg md:border md:rounded-2xl shrink-0 transition-transform duration-300 ${isCartMobileOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}`}>
                             <div className="p-3 border-b bg-white md:bg-gray-50 md:rounded-t-2xl space-y-2 relative shadow-sm md:shadow-none pt-4 md:pt-3">
                                 <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2" style={{ paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))', paddingBottom: '12px' }}>
                                         <button onClick={() => setIsCartMobileOpen(false)} className="md:hidden p-1.5 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200"><Icon name="XCircle" size={20}/></button>
                                         <h2 className="font-bold text-gray-800 text-lg md:text-base">{trxId ? 'Pesanan Diedit' : 'Keranjang Pesanan'}</h2>
                                     </div>
