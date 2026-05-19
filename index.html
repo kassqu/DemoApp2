@@ -656,10 +656,10 @@
                                         <input type="text" value={received} onChange={(e) => setReceived(formatThousand(e.target.value))} placeholder="0" className="w-full text-right text-2xl font-bold px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="grid grid-cols-4 gap-2">
-                                        <button onClick={() => handleQuickAmount('pas')} className="py-2 bg-gray-100 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-gray-500">PAS</button>
-                                        <button onClick={() => handleQuickAmount(20000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:bg-gray-500">20K</button>
-                                        <button onClick={() => handleQuickAmount(50000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:bg-gray-500">50K</button>
-                                        <button onClick={() => handleQuickAmount(100000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:bg-gray-500">100K</button>
+                                        <button onClick={() => handleQuickAmount('pas')} className="py-2 bg-orange-700 text-white border rounded-lg font-bold text-xs shadow-sm hover:border-blue-300">PAS</button>
+                                        <button onClick={() => handleQuickAmount(20000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:border-blue-300">20K</button>
+                                        <button onClick={() => handleQuickAmount(50000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:border-blue-300">50K</button>
+                                        <button onClick={() => handleQuickAmount(100000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:border-blue-300">100K</button>
                                     </div>
                                     <div className={`p-4 rounded-xl flex justify-between items-center font-bold border ${change > 0 ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                                         <span>Kembalian:</span><span className="text-xl">{formatRupiah(change)}</span>
