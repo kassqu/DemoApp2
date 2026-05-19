@@ -36,10 +36,6 @@
             color: #1f2937 !important;
             -webkit-text-fill-color: #1f2937 !important;
         }
-        /* Pastikan efek bounce bawaan browser bisa dikendalikan */
-        body {
-            background-color: #f9fafb;
-        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -161,26 +157,55 @@
             const [editingTrx, setEditingTrx] = useState(null);
 
             // ========================================================
-            // FITUR KUNCI SCROLL (ANTI-BOUNCE) SAAT SPLASH & LOGIN
+            // 🚀 FITUR KUNCI SCROLL (ANTI-BOUNCE iOS PWA) SAAT SPLASH & LOGIN
             // ========================================================
             const isAppLocked = showSplash || !isLoggedIn;
 
             useEffect(() => {
+                // Fungsi pembunuh gestur mentul-mentul di iOS
+                const preventBouncing = (e) => {
+                    // Biarkan user tap/scroll di dalam kolom inputan, 
+                    // tapi blokir tarik-tarik layar kosong
+                    if (e.target.tagName !== 'INPUT') {
+                        e.preventDefault();
+                    }
+                };
+
                 if (isAppLocked) {
+                    // 1. Ubah warna dasar web (Safe Area) ke warna gelap pekat (hitam/navy). 
+                    // Jadi kalau Safari masih maksa ada gap, warnanya hitam nyaru sama background!
+                    document.documentElement.style.backgroundColor = '#111827';
+                    document.body.style.backgroundColor = '#111827';
+                    
+                    // 2. Kunci posisi body absolut & potong sisa overflow agar tidak bisa digeser
+                    document.body.style.position = 'fixed';
+                    document.body.style.inset = '0';
                     document.body.style.overflow = 'hidden';
-                    document.body.style.height = '100dvh';
-                    document.body.style.overscrollBehavior = 'none'; // Matikan elastic scroll mentul-mentul di iOS
+                    document.documentElement.style.overflow = 'hidden';
+                    
+                    // 3. Pasang event listener JavaScript agresif untuk mematikan touchmove
+                    document.addEventListener('touchmove', preventBouncing, { passive: false });
                 } else {
-                    document.body.style.overflow = 'auto';
-                    document.body.style.height = 'auto';
-                    document.body.style.overscrollBehavior = 'auto';
+                    // Kembalikan ke warna asli web app normal (abu-abu terang bg-gray-50)
+                    document.documentElement.style.backgroundColor = '#f9fafb';
+                    document.body.style.backgroundColor = '';
+                    
+                    document.body.style.position = '';
+                    document.body.style.inset = '';
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    
+                    document.removeEventListener('touchmove', preventBouncing);
                 }
 
-                // Cleanup fungsi saat unmount
                 return () => {
-                    document.body.style.overflow = 'auto';
-                    document.body.style.height = 'auto';
-                    document.body.style.overscrollBehavior = 'auto';
+                    document.documentElement.style.backgroundColor = '';
+                    document.body.style.backgroundColor = '';
+                    document.body.style.position = '';
+                    document.body.style.inset = '';
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    document.removeEventListener('touchmove', preventBouncing);
                 };
             }, [isAppLocked]);
             // ========================================================
@@ -325,9 +350,8 @@
 
             if (showSplash) {
                 return (
-                    /* Ditambah kelas fixed inset-0, touch-none & overscroll-none untuk matikan gestur scroll total */
-                    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center text-white bg-gray-900 touch-none overscroll-none" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[4px]"></div>
+                    <div className="fixed inset-0 z-50 w-full h-[100dvh] flex flex-col items-center justify-center text-white bg-gray-900" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[4px] h-[100dvh] w-full"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
                             <div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-8 drop-shadow-md"></div>
                             <div className="flex items-center gap-3 animate-fade-in">
@@ -344,8 +368,7 @@
 
             if (!isLoggedIn) {
                 return (
-                    /* Ditambah fixed inset-0 & overflow-hidden supaya nempel absolut ke layar tanpa bisa di-scroll ke bawah */
-                    <div className="fixed inset-0 z-50 flex flex-col justify-center items-center p-4 font-sans bg-gray-900 overflow-y-auto overscroll-none" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                    <div className="min-h-[100dvh] flex flex-col justify-center items-center p-4 font-sans relative bg-gray-900" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-gray-900/50 backdrop-blur-[2px]"></div>
                         <div className="relative z-10 bg-white/20 backdrop-blur-[2px] p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
                             <div className="text-center mb-6 flex flex-col items-center">
