@@ -92,7 +92,8 @@
             Wallet: <><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></>,
             Receipt: <><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6"/><path d="M16 12h-8"/><path d="M16 16h-8"/></>,
             UserCircle: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></>,
-            Tag: <><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></>
+            Tag: <><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></>,
+            Lock: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>
         };
 
         const Icon = ({ name, size = 24, className = "" }) => (
@@ -109,7 +110,7 @@
             logo: null,
             receiptFooter: '*** TERIMA KASIH ***',
             modalLaci: 0,
-            categories: ['Kiloan', 'Satuan', 'Sepatu/Tas'] // 👈 Ditambahkan default list kategori
+            categories: ['Kiloan', 'Satuan', 'Sepatu/Tas']
         };
 
         const INITIAL_PRODUCTS = [
@@ -139,6 +140,66 @@
             });
         };
 
+        // --- KOMPONEN OTORISASI PIN ADMIN ---
+        function AdminAuthModal({ onClose, onConfirm, staffList, showAlert }) {
+            const [pin, setPin] = useState('');
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                let isValid = false;
+                
+                if (staffList && staffList.length > 0) {
+                    // Cari apakah PIN ini cocok dengan akun yang kode kasirnya mengandung kata "admin"
+                    const adminUser = staffList.find(s => 
+                        String(s.pin) === pin && 
+                        (String(s.kodeKasir).toLowerCase() === 'admin' || String(s.kodeKasir).toLowerCase().includes('admin'))
+                    );
+                    if (adminUser) isValid = true;
+                } else {
+                    // Fallback sementara jika database kosong (hanya untuk testing awal)
+                    if (pin === '123') isValid = true; 
+                }
+
+                if (isValid) {
+                    onConfirm();
+                } else {
+                    showAlert('PIN salah! Akses ditolak.', 'error');
+                    setPin('');
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl w-full max-w-xs overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 border border-gray-100">
+                        <div className="p-6 border-b flex flex-col items-center justify-center text-center bg-gray-50/50">
+                            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3 shadow-sm border border-blue-100">
+                                <Icon name="Lock" size={30} />
+                            </div>
+                            <h3 className="text-xl font-black text-gray-800 tracking-tight">Otorisasi Admin</h3>
+                            <p className="text-xs text-gray-500 mt-1.5 font-medium leading-relaxed">Akses halaman ini membutuhkan<br/>izin khusus (PIN Admin).</p>
+                        </div>
+                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                            <div>
+                                <input 
+                                    type="password" 
+                                    inputMode="numeric"
+                                    autoFocus
+                                    placeholder="••••••" 
+                                    value={pin} 
+                                    onChange={e => setPin(e.target.value)}
+                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none text-center text-2xl tracking-[0.5em] font-black text-gray-800 transition-all bg-gray-50/50"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 pt-2">
+                                <button type="button" onClick={onClose} className="py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 transition-all text-sm">Batal</button>
+                                <button type="submit" className="py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-blue-200 text-sm">Konfirmasi</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
         // --- KOMPONEN UTAMA ---
         function App() {
             const [showSplash, setShowSplash] = useState(true);
@@ -156,8 +217,15 @@
             const [products, setProducts] = useState(INITIAL_PRODUCTS);
             const [transactions, setTransactions] = useState([]);
             
+            // State untuk menyimpan daftar staff dari database untuk validasi PIN Admin
+            const [staffList, setStaffList] = useState([]);
+
             const [loginError, setLoginError] = useState('');
             const [editingTrx, setEditingTrx] = useState(null);
+
+            // State Modal Otorisasi
+            const [showAuthModal, setShowAuthModal] = useState(false);
+            const [pendingAuthAction, setPendingAuthAction] = useState(null);
 
             // ========================================================
             // 🚀 FITUR KUNCI SCROLL (ANTI-BOUNCE iOS PWA) SAAT SPLASH & LOGIN
@@ -237,8 +305,11 @@
                     try {
                         const res = await fetchFromGAS({ action: 'GET_DATA' });
                         if (isMounted && res.status === 'success') {
+                            // Simpan daftar staff ke memory agar otorisasi jalan cepat
+                            if (res.data.staff && Array.isArray(res.data.staff)) {
+                                setStaffList(res.data.staff);
+                            }
                             if (res.data.settings && Object.keys(res.data.settings).length > 0) {
-                                // Gabungkan dengan INITIAL_SETTINGS agar categories default tidak hilang jika di database kosong
                                 setSettings({ ...INITIAL_SETTINGS, ...res.data.settings });
                             }
                             if (res.data.products && Array.isArray(res.data.products) && res.data.products.length > 0) {
@@ -275,6 +346,7 @@
 
                 if (res.status === 'success') {
                     const staffData = res.data.staff || [];
+                    setStaffList(staffData); // Simpan daftar staff pas login
                     
                     let validUser = staffData.find(s => {
                         const dbUser = String(s.kodeKasir || s['Kode Kasir'] || '').trim();
@@ -308,6 +380,19 @@
                     }
                 } else {
                     setLoginError(res.message || 'Gagal koneksi ke server database.');
+                }
+            };
+
+            // FUNGSI GATEKEEPER UNTUK MINTA IZIN ADMIN
+            const requestAuth = (actionCallback) => {
+                const currentKode = String(currentUser?.kodeKasir || '').toLowerCase();
+                // Jika user yang sedang login sudah admin, maka langsung lolos (bypass)
+                if (currentKode === 'admin' || currentKode.includes('admin')) {
+                    actionCallback();
+                } else {
+                    // Tahan action-nya, tampilkan modal PIN
+                    setPendingAuthAction(() => actionCallback);
+                    setShowAuthModal(true);
                 }
             };
 
@@ -407,26 +492,29 @@
                     </header>
 
                     <main className="flex-1 max-w-7xl mx-auto w-full p-4 print:p-0">
-                        {activeTab === 'dashboard' && <DashboardView transactions={transactions} formatRupiah={formatRupiah} settings={settings} onSaveSettings={updateSettingsDb} />}
+                        {activeTab === 'dashboard' && <DashboardView transactions={transactions} formatRupiah={formatRupiah} settings={settings} onSaveSettings={updateSettingsDb} requestAuth={requestAuth} />}
                         {activeTab === 'produk' && <ProdukView products={products} onSaveProduct={saveProductDb} onDeleteProduct={deleteProductDb} formatRupiah={formatRupiah} searchQuery={searchQuery} compressImage={compressImage} settings={settings} onSaveSettings={updateSettingsDb} showAlert={showAlert} />}
                         {activeTab === 'kasir' && <KasirView products={products} transactions={transactions} onSaveTransaction={saveTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} settings={settings} editingTrx={editingTrx} clearEditingTrx={() => setEditingTrx(null)} showAlert={showAlert} />}
-                        {activeTab === 'laporan' && <LaporanView transactions={transactions} onDeleteTransaction={deleteTransactionDb} onUpdateTransaction={saveTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} onLoadToKasir={(trx)=>{setEditingTrx(trx); setActiveTab('kasir');}} settings={settings} />}
+                        {activeTab === 'laporan' && <LaporanView transactions={transactions} onDeleteTransaction={deleteTransactionDb} onUpdateTransaction={saveTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} onLoadToKasir={(trx)=>{setEditingTrx(trx); setActiveTab('kasir');}} settings={settings} showAlert={showAlert} />}
                         {activeTab === 'setup' && <SetupView settings={settings} onSaveSettings={updateSettingsDb} compressImage={compressImage} />}
                     </main>
 
                     <nav className="fixed bottom-[calc(6px+env(safe-area-inset-bottom,0px))] left-4 right-4 max-w-xl mx-auto bg-white border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex justify-around items-center h-16 z-30 px-2 sm:px-6 rounded-2xl print:hidden animate-in slide-in-from-bottom-5">
                         <NavItem icon={<Icon name="Home" size={24} />} label="Dashboard" isActive={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-                        <NavItem icon={<Icon name="Package" size={24} />} label="Produk" isActive={activeTab === 'produk'} onClick={() => setActiveTab('produk')} />
+                        {/* 🔴 Menu Produk Dilindungi PIN */}
+                        <NavItem icon={<Icon name="Package" size={24} />} label="Produk" isActive={activeTab === 'produk'} onClick={() => requestAuth(() => setActiveTab('produk'))} />
                         <div className="-mt-6 relative flex flex-col items-center">
                             <button onClick={() => setActiveTab('kasir')} className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg text-white transition-transform hover:scale-105 active:scale-95 ${activeTab === 'kasir' ? 'bg-blue-700 ring-4 ring-blue-100' : 'bg-blue-500'}`}><Icon name="ShoppingCart" size={28} /></button>
                             <span className={`text-[10px] font-bold mt-1 ${activeTab === 'kasir' ? 'text-blue-700' : 'text-gray-500'}`}>KASIR</span>
                         </div>
                         <NavItem icon={<Icon name="FileText" size={24} />} label="Laporan" isActive={activeTab === 'laporan'} onClick={() => setActiveTab('laporan')} />
-                        <NavItem icon={<Icon name="Settings" size={24} />} label="Setup" isActive={activeTab === 'setup'} onClick={() => setActiveTab('setup')} />
+                        {/* 🔴 Menu Setup Dilindungi PIN */}
+                        <NavItem icon={<Icon name="Settings" size={24} />} label="Setup" isActive={activeTab === 'setup'} onClick={() => requestAuth(() => setActiveTab('setup'))} />
                     </nav>
 
+                    {/* MODAL GLOBAL ALERT */}
                     {appAlert && (
-                        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="fixed inset-0 bg-black/60 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200">
                             <div className="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl animate-in zoom-in-95 duration-200 text-center border border-gray-100">
                                 <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 ${appAlert.type === 'error' ? 'bg-red-50 text-red-500' : appAlert.type === 'info' ? 'bg-blue-50 text-blue-500' : 'bg-green-50 text-green-500'}`}>
                                     <Icon name={appAlert.type === 'error' ? 'XCircle' : 'CheckCircle2'} size={32} />
@@ -439,11 +527,28 @@
                             </div>
                         </div>
                     )}
+
+                    {/* MODAL OTORISASI ADMIN (PIN) */}
+                    {showAuthModal && (
+                        <AdminAuthModal 
+                            staffList={staffList}
+                            showAlert={showAlert}
+                            onClose={() => {
+                                setShowAuthModal(false);
+                                setPendingAuthAction(null);
+                            }}
+                            onConfirm={() => {
+                                setShowAuthModal(false);
+                                if (pendingAuthAction) pendingAuthAction();
+                                setPendingAuthAction(null);
+                            }}
+                        />
+                    )}
                 </div>
             );
         }
 
-        function DashboardView({ transactions, formatRupiah, settings, onSaveSettings }) {
+        function DashboardView({ transactions, formatRupiah, settings, onSaveSettings, requestAuth }) {
             const [inputModal, setInputModal] = useState(formatThousand(settings?.modalLaci || 0));
             const [isEditing, setIsEditing] = useState(false);
 
@@ -501,7 +606,8 @@
                                         <button onClick={() => { setIsEditing(false); setInputModal(formatThousand(settings?.modalLaci || 0)); }} className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-bold">Batal</button>
                                     </div>
                                 ) : (
-                                    <button onClick={() => setIsEditing(true)} className="w-full sm:w-auto bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors"><Icon name="Edit" size={12}/> Atur Modal Awal</button>
+                                    // 🔴 Tombol Atur Modal Awal dilindungi PIN
+                                    <button onClick={() => requestAuth(() => setIsEditing(true))} className="w-full sm:w-auto bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors"><Icon name="Edit" size={12}/> Atur Modal Awal</button>
                                 )}
                             </div>
                         </div>
@@ -906,10 +1012,11 @@
             );
         }
 
-        function LaporanView({ transactions, onDeleteTransaction, onUpdateTransaction, formatRupiah, searchQuery, onLoadToKasir, settings }) {
+        function LaporanView({ transactions, onDeleteTransaction, onUpdateTransaction, formatRupiah, searchQuery, onLoadToKasir, settings, showAlert }) {
             const [filterPreset, setFilterPreset] = useState('semua');
             const [startDate, setStartDate] = useState(''); 
             const [endDate, setEndDate] = useState('');
+            const [receiptData, setReceiptData] = useState(null); 
             
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -1081,13 +1188,16 @@
                                 </select>
                             </td>
                             <td className="p-3 print:hidden flex gap-2">
-                                {t.status==='Belum Lunas' && <button onClick={()=>onLoadToKasir(t)} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">Bayar</button>}
-                                <button onClick={()=>onDeleteTransaction(t.id)} className="text-red-400 hover:text-red-600"><Icon name="Trash2" size={16}/></button>
+                                <button onClick={()=>setReceiptData(t)} className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors border shadow-sm"><Icon name="Receipt" size={12}/> Struk</button>
+                                {t.status==='Belum Lunas' && <button onClick={()=>onLoadToKasir(t)} className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors border shadow-sm"><Icon name="Wallet" size={12}/> Bayar</button>}
                             </td>
                         </tr>
                         ))}
                     </tbody></table></div>
                     <div className="hidden print:block text-right font-bold text-lg p-2 mt-4">Total Lunas: {formatRupiah(totalOmset)} <br/> Laba Bersih: {formatRupiah(labaBersih)}</div>
+                    
+                    {/* Modal Struk Laporan */}
+                    {receiptData && <ReceiptModal data={receiptData} settings={settings} onClose={()=>setReceiptData(null)} formatRupiah={formatRupiah} showAlert={showAlert} />}
                 </div>
             );
         }
