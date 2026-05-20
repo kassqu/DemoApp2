@@ -73,6 +73,7 @@
             Package: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
             ShoppingCart: <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>,
             FileText: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></>,
+            FileSpreadsheet: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M12 13v4"/></>,
             Settings: <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></>,
             Search: <><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
             Plus: <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
@@ -90,7 +91,8 @@
             Bluetooth: <polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/>,
             Wallet: <><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></>,
             Receipt: <><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6"/><path d="M16 12h-8"/><path d="M16 16h-8"/></>,
-            UserCircle: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></>
+            UserCircle: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></>,
+            Tag: <><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></>
         };
 
         const Icon = ({ name, size = 24, className = "" }) => (
@@ -106,7 +108,8 @@
             phone: '0812-3456-7890',
             logo: null,
             receiptFooter: '*** TERIMA KASIH ***',
-            modalLaci: 0
+            modalLaci: 0,
+            categories: ['Kiloan', 'Satuan', 'Sepatu/Tas'] // 👈 Ditambahkan default list kategori
         };
 
         const INITIAL_PRODUCTS = [
@@ -162,39 +165,27 @@
             const isAppLocked = showSplash || !isLoggedIn;
 
             useEffect(() => {
-                // Fungsi pembunuh gestur mentul-mentul di iOS
                 const preventBouncing = (e) => {
-                    // Biarkan user tap/scroll di dalam kolom inputan, 
-                    // tapi blokir tarik-tarik layar kosong
                     if (e.target.tagName !== 'INPUT') {
                         e.preventDefault();
                     }
                 };
 
                 if (isAppLocked) {
-                    // 1. Ubah warna dasar web (Safe Area) ke warna gelap pekat (hitam/navy). 
-                    // Jadi kalau Safari masih maksa ada gap, warnanya hitam nyaru sama background!
                     document.documentElement.style.backgroundColor = '#111827';
                     document.body.style.backgroundColor = '#111827';
-                    
-                    // 2. Kunci posisi body absolut & potong sisa overflow agar tidak bisa digeser
                     document.body.style.position = 'fixed';
                     document.body.style.inset = '0';
                     document.body.style.overflow = 'hidden';
                     document.documentElement.style.overflow = 'hidden';
-                    
-                    // 3. Pasang event listener JavaScript agresif untuk mematikan touchmove
                     document.addEventListener('touchmove', preventBouncing, { passive: false });
                 } else {
-                    // Kembalikan ke warna asli web app normal (abu-abu terang bg-gray-50)
                     document.documentElement.style.backgroundColor = '#f9fafb';
                     document.body.style.backgroundColor = '';
-                    
                     document.body.style.position = '';
                     document.body.style.inset = '';
                     document.body.style.overflow = '';
                     document.documentElement.style.overflow = '';
-                    
                     document.removeEventListener('touchmove', preventBouncing);
                 }
 
@@ -247,6 +238,7 @@
                         const res = await fetchFromGAS({ action: 'GET_DATA' });
                         if (isMounted && res.status === 'success') {
                             if (res.data.settings && Object.keys(res.data.settings).length > 0) {
+                                // Gabungkan dengan INITIAL_SETTINGS agar categories default tidak hilang jika di database kosong
                                 setSettings({ ...INITIAL_SETTINGS, ...res.data.settings });
                             }
                             if (res.data.products && Array.isArray(res.data.products) && res.data.products.length > 0) {
@@ -350,8 +342,8 @@
 
             if (showSplash) {
                 return (
-                    <div className="fixed inset-0 z-50 w-full h-[100dvh] flex flex-col items-center justify-center text-white bg-gray-900" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[4px] h-[100dvh] w-full"></div>
+                    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center text-white bg-gray-900 touch-none overscroll-none" style={{ backgroundImage: `url('${SPLASH_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                        <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[4px]"></div>
                         <div className="relative z-10 flex flex-col items-center animate-in fade-in duration-700">
                             <div className="w-16 h-16 rounded-full animate-spin border-[4px] border-white border-t-[#5c5cff] border-l-[#5c5cff] mb-8 drop-shadow-md"></div>
                             <div className="flex items-center gap-3 animate-fade-in">
@@ -368,7 +360,7 @@
 
             if (!isLoggedIn) {
                 return (
-                    <div className="min-h-[100dvh] flex flex-col justify-center items-center p-4 font-sans relative bg-gray-900" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                    <div className="fixed inset-0 z-50 flex flex-col justify-center items-center p-4 font-sans bg-gray-900 overflow-y-auto overscroll-none" style={{ backgroundImage: `url('${LOGIN_BG_IMAGE}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                         <div className="absolute inset-0 bg-gradient-to-b from-gray-900/20 to-gray-900/50 backdrop-blur-[2px]"></div>
                         <div className="relative z-10 bg-white/20 backdrop-blur-[2px] p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30">
                             <div className="text-center mb-6 flex flex-col items-center">
@@ -395,9 +387,7 @@
             }
 
             return (
-                /* padding-bottom disesuaikan (82px) agar konten tidak terpotong oleh Floating Nav yang diturunkan */
                 <div className="min-h-[100dvh] bg-gray-50 flex flex-col font-sans pb-[calc(82px+env(safe-area-inset-bottom))] print:pb-0 print:bg-white">
-                    {/* Header Atas: Tambah Safe-Area Padding-Top agar turun di bawah jam/baterai HP bawaan */}
                     <header className="bg-white shadow-sm sticky top-0 z-20 print:hidden" style={{ paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))', paddingBottom: '12px' }}>
                         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -418,13 +408,12 @@
 
                     <main className="flex-1 max-w-7xl mx-auto w-full p-4 print:p-0">
                         {activeTab === 'dashboard' && <DashboardView transactions={transactions} formatRupiah={formatRupiah} settings={settings} onSaveSettings={updateSettingsDb} />}
-                        {activeTab === 'produk' && <ProdukView products={products} onSaveProduct={saveProductDb} onDeleteProduct={deleteProductDb} formatRupiah={formatRupiah} searchQuery={searchQuery} compressImage={compressImage} />}
+                        {activeTab === 'produk' && <ProdukView products={products} onSaveProduct={saveProductDb} onDeleteProduct={deleteProductDb} formatRupiah={formatRupiah} searchQuery={searchQuery} compressImage={compressImage} settings={settings} onSaveSettings={updateSettingsDb} showAlert={showAlert} />}
                         {activeTab === 'kasir' && <KasirView products={products} transactions={transactions} onSaveTransaction={saveTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} settings={settings} editingTrx={editingTrx} clearEditingTrx={() => setEditingTrx(null)} showAlert={showAlert} />}
                         {activeTab === 'laporan' && <LaporanView transactions={transactions} onDeleteTransaction={deleteTransactionDb} onUpdateTransaction={saveTransactionDb} formatRupiah={formatRupiah} searchQuery={searchQuery} onLoadToKasir={(trx)=>{setEditingTrx(trx); setActiveTab('kasir');}} settings={settings} />}
                         {activeTab === 'setup' && <SetupView settings={settings} onSaveSettings={updateSettingsDb} compressImage={compressImage} />}
                     </main>
 
-                    {/* FLOATING NAVIGATION ISLAND - Diturunkan ke bottom-1.5 (6px) demi komposisi seimbang yang sempurna */}
                     <nav className="fixed bottom-[calc(6px+env(safe-area-inset-bottom,0px))] left-4 right-4 max-w-xl mx-auto bg-white border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex justify-around items-center h-16 z-30 px-2 sm:px-6 rounded-2xl print:hidden animate-in slide-in-from-bottom-5">
                         <NavItem icon={<Icon name="Home" size={24} />} label="Dashboard" isActive={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
                         <NavItem icon={<Icon name="Package" size={24} />} label="Produk" isActive={activeTab === 'produk'} onClick={() => setActiveTab('produk')} />
@@ -436,16 +425,15 @@
                         <NavItem icon={<Icon name="Settings" size={24} />} label="Setup" isActive={activeTab === 'setup'} onClick={() => setActiveTab('setup')} />
                     </nav>
 
-                    {/* MODAL NOTIFIKASI CUSTOM (Z-index dinaikkan dan bg diseragamkan) */}
                     {appAlert && (
                         <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
                             <div className="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl animate-in zoom-in-95 duration-200 text-center border border-gray-100">
-                                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 ${appAlert.type === 'error' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
+                                <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 ${appAlert.type === 'error' ? 'bg-red-50 text-red-500' : appAlert.type === 'info' ? 'bg-blue-50 text-blue-500' : 'bg-green-50 text-green-500'}`}>
                                     <Icon name={appAlert.type === 'error' ? 'XCircle' : 'CheckCircle2'} size={32} />
                                 </div>
                                 <h3 className="font-bold text-gray-800 text-lg mb-2">Pemberitahuan</h3>
                                 <p className="text-xs text-gray-500 mb-6 leading-relaxed">{appAlert.message}</p>
-                                <button onClick={() => setAppAlert(null)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-blue-100 active:scale-95 transition-all text-sm">
+                                <button onClick={() => setAppAlert(null)} className={`w-full text-white font-bold py-3 rounded-2xl shadow-lg active:scale-95 transition-all text-sm ${appAlert.type === 'error' ? 'bg-red-600 hover:bg-red-700 shadow-red-100' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'}`}>
                                     Mengerti
                                 </button>
                             </div>
@@ -549,19 +537,34 @@
             );
         }
 
-        function ProdukView({ products, onSaveProduct, onDeleteProduct, formatRupiah, searchQuery, compressImage }) {
+        // ==========================================
+        // FITUR BARU: MANAJEMEN PRODUK & KATEGORI
+        // ==========================================
+        function ProdukView({ products, onSaveProduct, onDeleteProduct, formatRupiah, searchQuery, compressImage, settings, onSaveSettings, showAlert }) {
             const [isModalOpen, setIsModalOpen] = useState(false);
+            const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false); // Modal state untuk kategori
             const [editingProduct, setEditingProduct] = useState(null);
-            const [name, setName] = useState(''); const [price, setPrice] = useState(''); const [costPrice, setCostPrice] = useState(''); const [unit, setUnit] = useState('Kg'); const [category, setCategory] = useState('Kiloan'); const [image, setImage] = useState(null);
+            
+            const [newCategory, setNewCategory] = useState(''); // Inputan kategori baru
+            
+            // Siapkan list kategori (fallback jika kosong)
+            const catList = settings?.categories && settings.categories.length > 0 ? settings.categories : ['Umum'];
+
+            const [name, setName] = useState(''); 
+            const [price, setPrice] = useState(''); 
+            const [costPrice, setCostPrice] = useState(''); 
+            const [unit, setUnit] = useState('Kg'); 
+            const [category, setCategory] = useState(catList[0]); 
+            const [image, setImage] = useState(null);
 
             const filteredProducts = products.filter(p => (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
             const handleImageUpload = async (e) => { if (e.target.files[0]) setImage(await compressImage(e.target.files[0])); };
             
             const openModal = (product = null) => {
                 if (product) { 
-                    setEditingProduct(product); setName(product.name); setPrice(formatThousand(product.price)); setCostPrice(formatThousand(product.costPrice || 0)); setUnit(product.unit); setCategory(product.category); setImage(product.image); 
+                    setEditingProduct(product); setName(product.name); setPrice(formatThousand(product.price)); setCostPrice(formatThousand(product.costPrice || 0)); setUnit(product.unit); setCategory(product.category || catList[0]); setImage(product.image); 
                 } else { 
-                    setEditingProduct(null); setName(''); setPrice(''); setCostPrice(''); setUnit('Kg'); setCategory('Kiloan'); setImage(null); 
+                    setEditingProduct(null); setName(''); setPrice(''); setCostPrice(''); setUnit('Kg'); setCategory(catList[0]); setImage(null); 
                 }
                 setIsModalOpen(true);
             };
@@ -572,11 +575,51 @@
                 setIsModalOpen(false); 
             };
 
-            // MODAL DIKELUARKAN DARI DALAM KOTAK ANIMASI AGAR FULL SCREEN (TIDAK TERPOTONG JAM)
+            // Fungsi Tambah Kategori
+            const handleAddCategory = () => {
+                const trimmed = newCategory.trim();
+                if (!trimmed) return;
+                
+                const currentCats = settings?.categories || [];
+                if (currentCats.map(c=>c.toLowerCase()).includes(trimmed.toLowerCase())) {
+                    showAlert('Kategori tersebut sudah ada di daftar!', 'error');
+                    return;
+                }
+                
+                const updatedCats = [...currentCats, trimmed];
+                onSaveSettings({ ...settings, categories: updatedCats });
+                setNewCategory('');
+                showAlert('Kategori baru berhasil ditambahkan!', 'success');
+            };
+
+            // Fungsi Hapus Kategori
+            const handleDeleteCategory = (catToDelete) => {
+                const currentCats = settings?.categories || [];
+                const updatedCats = currentCats.filter(c => c !== catToDelete);
+                onSaveSettings({ ...settings, categories: updatedCats });
+                
+                // Pastikan jika kategori yg dihapus lagi terpilih di form, ganti ke yg lain
+                if (category === catToDelete && updatedCats.length > 0) {
+                    setCategory(updatedCats[0]);
+                }
+            };
+
             return (
                 <>
                     <div className="space-y-4 animate-in fade-in duration-500">
-                        <div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-gray-800">Manajemen Layanan</h2><button onClick={() => openModal()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Icon name="Plus" size={20} /> <span className="hidden sm:inline">Tambah Produk</span></button></div>
+                        {/* HEADER BUTTONS: Kategori & Tambah Produk */}
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Layanan</h2>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setIsCategoryModalOpen(true)} className="bg-orange-50 hover:bg-orange-100 text-orange-600 px-3 py-2 rounded-lg flex items-center gap-1.5 font-bold shadow-sm transition-colors text-sm">
+                                    <Icon name="Tag" size={18} /> <span className="hidden sm:inline">Kategori</span>
+                                </button>
+                                <button onClick={() => openModal()} className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-1.5 font-bold shadow-md transition-colors text-sm">
+                                    <Icon name="Plus" size={18} /> <span className="hidden sm:inline">Produk</span>
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                             {filteredProducts.map(p => (
                                 <div key={p.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md flex flex-col">
@@ -586,23 +629,80 @@
                             ))}
                         </div>
                     </div>
+
+                    {/* MODAL TAMBAH/EDIT PRODUK */}
                     {isModalOpen && (
                         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
-                            <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-                                <div className="p-6 border-b border-gray-100"><h3 className="text-xl font-bold text-gray-800">{editingProduct ? 'Edit Layanan' : 'Tambah Layanan Baru'}</h3></div>
-                                <form onSubmit={saveProduct} className="p-6 space-y-4">
+                            <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                                <div className="p-5 border-b flex justify-between items-center bg-gray-50">
+                                    <h3 className="text-xl font-bold text-gray-800">{editingProduct ? 'Edit Layanan' : 'Tambah Layanan Baru'}</h3>
+                                    <button onClick={()=>setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600"><Icon name="XCircle" size={24}/></button>
+                                </div>
+                                <form onSubmit={saveProduct} className="p-5 space-y-4 overflow-y-auto">
                                     <div><label className="block text-sm font-medium mb-1">Nama Layanan</label><input type="text" required value={name} onChange={e=>setName(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" /></div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div><label className="block text-sm font-medium mb-1 text-orange-600">Harga Modal (Rp)</label><input type="text" value={costPrice} onChange={e=>setCostPrice(formatThousand(e.target.value))} placeholder="Modal/Dasar" className="w-full px-3 py-2 border border-orange-200 bg-orange-50/50 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none font-bold text-orange-700" /></div>
                                         <div><label className="block text-sm font-medium mb-1 text-blue-700">Harga Jual (Rp)</label><input type="text" required value={price} onChange={e=>setPrice(formatThousand(e.target.value))} placeholder="Jual ke Pelanggan" className="w-full px-3 py-2 border border-blue-200 bg-blue-50/50 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-700" /></div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium mb-1">Satuan</label><select value={unit} onChange={e=>setUnit(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="Kg">Kg</option><option value="Pcs">Pcs</option><option value="Psg">Pasang</option><option value="Meter">Meter</option></select></div>
-                                        <div><label className="block text-sm font-medium mb-1">Kategori</label><select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="Kiloan">Kiloan</option><option value="Satuan">Satuan</option><option value="Sepatu">Sepatu/Tas</option></select></div>
+                                        <div><label className="block text-sm font-medium mb-1">Satuan</label><select value={unit} onChange={e=>setUnit(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="Kg">Kg</option><option value="Pcs">Pcs</option><option value="Psg">Pasang</option><option value="Meter">Meter</option><option value="Liter">Liter</option><option value="Paket">Paket</option></select></div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Kategori</label>
+                                            <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                                                {/* DATA KATEGORI SEKARANG DI-RENDER DINAMIS DARI DATABASE */}
+                                                {catList.map((cat, idx) => (
+                                                    <option key={idx} value={cat}>{cat}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                     <div><label className="block text-sm font-medium mb-1">Foto Layanan</label><div className="flex items-center gap-4">{image && <img src={image} className="w-16 h-16 rounded object-cover" />}<input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm" /></div></div>
-                                    <div className="flex gap-3 pt-4"><button type="button" onClick={()=>setIsModalOpen(false)} className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold">Batal</button><button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-md hover:bg-blue-700">Simpan Produk</button></div>
+                                    <div className="flex gap-3 pt-4"><button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700">Simpan Produk</button></div>
                                 </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL MANAJEMEN KATEGORI CUSTOM */}
+                    {isCategoryModalOpen && (
+                        <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                            <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
+                                <div className="p-5 border-b bg-gray-50 flex justify-between items-center relative">
+                                    <div className="flex items-center gap-2 text-orange-600">
+                                        <Icon name="Tag" size={24} />
+                                        <h3 className="text-xl font-bold text-gray-800">Atur Kategori</h3>
+                                    </div>
+                                    <button onClick={()=>setIsCategoryModalOpen(false)} className="text-gray-400 hover:text-gray-600"><Icon name="XCircle" size={24}/></button>
+                                </div>
+                                <div className="p-5 flex-1 flex flex-col min-h-0">
+                                    <div className="flex gap-2 mb-4 shrink-0">
+                                        <input 
+                                            type="text" 
+                                            value={newCategory} 
+                                            onChange={e=>setNewCategory(e.target.value)} 
+                                            onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
+                                            placeholder="Cth: Minuman, Ban, Baju..." 
+                                            className="flex-1 px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm" 
+                                        />
+                                        <button onClick={handleAddCategory} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl font-bold shadow-sm transition-colors text-sm">
+                                            Tambah
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-500 font-bold uppercase mb-2">Daftar Kategori Anda:</p>
+                                    <div className="space-y-2 overflow-y-auto pr-1">
+                                        {catList.map((cat, idx) => (
+                                            <div key={idx} className="flex justify-between items-center p-3 bg-white border border-gray-100 shadow-sm rounded-xl hover:border-orange-200 transition-colors">
+                                                <span className="font-bold text-gray-700 text-sm">{cat}</span>
+                                                <button onClick={()=>handleDeleteCategory(cat)} className="text-red-400 hover:bg-red-50 p-1.5 rounded-lg transition-colors">
+                                                    <Icon name="Trash2" size={16}/>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="p-4 border-t bg-gray-50">
+                                    <button onClick={()=>setIsCategoryModalOpen(false)} className="w-full py-2.5 bg-gray-200 text-gray-800 font-bold rounded-xl active:scale-95 transition-transform">Selesai</button>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -656,10 +756,10 @@
                                         <input type="text" value={received} onChange={(e) => setReceived(formatThousand(e.target.value))} placeholder="0" className="w-full text-right text-2xl font-bold px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" />
                                     </div>
                                     <div className="grid grid-cols-4 gap-2">
-                                        <button onClick={() => handleQuickAmount('pas')} className="py-2 bg-orange-700 text-white border rounded-lg font-bold text-xs shadow-sm hover:border-blue-300">PAS</button>
-                                        <button onClick={() => handleQuickAmount(20000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:border-blue-300">20K</button>
-                                        <button onClick={() => handleQuickAmount(50000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:border-blue-300">50K</button>
-                                        <button onClick={() => handleQuickAmount(100000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:border-blue-300">100K</button>
+                                        <button onClick={() => handleQuickAmount('pas')} className="py-2 bg-gray-800 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-gray-700">PAS</button>
+                                        <button onClick={() => handleQuickAmount(20000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:bg-gray-200">20K</button>
+                                        <button onClick={() => handleQuickAmount(50000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:bg-gray-200">50K</button>
+                                        <button onClick={() => handleQuickAmount(100000)} className="py-2 bg-gray-100 text-gray-700 border rounded-lg font-bold text-xs hover:bg-gray-200">100K</button>
                                     </div>
                                     <div className={`p-4 rounded-xl flex justify-between items-center font-bold border ${change > 0 ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
                                         <span>Kembalian:</span><span className="text-xl">{formatRupiah(change)}</span>
@@ -745,7 +845,6 @@
                 onSaveTransaction(newTrx); setReceiptData(newTrx); cancelEdit(); setIsCartMobileOpen(false);
             };
 
-            // MODAL DIKELUARKAN DARI DALAM KOTAK ANIMASI FLEX AGAR FULL SCREEN AMAN DI iOS
             return (
                 <>
                     <div className="flex flex-row gap-3 sm:gap-6 animate-in fade-in h-[calc(100vh-140px)] relative overflow-hidden">
@@ -852,9 +951,55 @@
             
             const labaBersih = totalOmset - totalModal;
 
+            // Fitur Export ke Excel (CSV)
+            const exportToExcel = () => {
+                const headers = ['ID Transaksi', 'No Antrian', 'Tanggal Masuk', 'Jadwal Ambil', 'Nama Pelanggan', 'Layanan Dibeli', 'Total Belanja (Rp)', 'Status Bayar', 'Metode Bayar', 'Status Proses'];
+                const csvRows = [headers.join(';')];
+
+                filteredTrx.forEach(t => {
+                    const id = t.id || '-';
+                    const queue = t.queueNumber || '-';
+                    const date = t.date ? new Date(t.date).toLocaleDateString('id-ID') : '-';
+                    const pickup = t.pickupDate ? new Date(t.pickupDate).toLocaleDateString('id-ID') : '-';
+                    const customer = t.customer || 'Pelanggan';
+                    const items = (t.items || []).map(i => `${i.qty}${i.unit} ${i.name}`).join(', ');
+                    const total = t.total || 0;
+                    const status = t.status || '-';
+                    const method = t.paymentMethod || '-';
+                    const progress = t.progressStatus || '-';
+
+                    const row = [id, queue, date, pickup, customer, items, total, status, method, progress]
+                        .map(field => `"${String(field).replace(/"/g, '""')}"`) // Escape format text biar rapi di excel
+                        .join(';');
+                    csvRows.push(row);
+                });
+
+                // Tambahkan BOM (\uFEFF) agar terbaca sempurna di Microsoft Excel
+                const csvString = "\uFEFF" + csvRows.join('\n');
+                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `Laporan_KassQu_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
             return (
                 <div className="space-y-4 animate-in fade-in">
-                    <div className="flex justify-between items-center print:hidden"><h2 className="text-xl font-bold text-gray-800">Laporan Keuangan</h2><button onClick={()=>window.print()} className="bg-green-600 text-white px-3 py-1.5 rounded flex items-center gap-1 text-sm"><Icon name="Download" size={14}/> Cetak PDF</button></div>
+                    <div className="flex justify-between items-center print:hidden">
+                        <h2 className="text-xl font-bold text-gray-800">Laporan Keuangan</h2>
+                        <div className="flex gap-2">
+                            <button onClick={exportToExcel} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm font-bold shadow-sm transition-colors">
+                                <Icon name="FileSpreadsheet" size={14}/> <span className="hidden sm:inline">Cetak Excel</span><span className="sm:hidden">Excel</span>
+                            </button>
+                            <button onClick={()=>window.print()} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm font-bold shadow-sm transition-colors">
+                                <Icon name="Printer" size={14}/> <span className="hidden sm:inline">Cetak PDF</span><span className="sm:hidden">PDF</span>
+                            </button>
+                        </div>
+                    </div>
                     
                     <div className="bg-white p-3 rounded-xl shadow-sm border flex flex-col gap-3 print:hidden text-sm">
                         <div className="flex items-center gap-2">
