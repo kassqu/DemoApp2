@@ -1,7 +1,7 @@
 {
-  "name": "Laundry Clean & Fresh",
-  "short_name": "KassQu - Laundry C&F",
-  "description": "Aplikasi Laundry Modern by Fika Naka",
+  "name": "DemoApp2",
+  "short_name": "DemoApp2",
+  "description": "Aplikasi Kasir Modern by Fika Naka",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
