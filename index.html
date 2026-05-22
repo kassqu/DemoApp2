@@ -130,28 +130,33 @@
             });
         };
 
-        function AdminAuthModal({ onClose, onConfirm, staffList, showAlert }) {
+        function AdminAuthModal({ onClose, onConfirm, showAlert }) {
             const [pin, setPin] = useState('');
+            const [loading, setLoading] = useState(false);
             
-            const handleSubmit = (e) => {
+            const handleSubmit = async (e) => {
                 e.preventDefault();
-                let isValid = false;
+                setLoading(true);
                 
-                if (staffList && staffList.length > 0) {
-                    const adminUser = staffList.find(s => 
-                        String(s.pin) === pin && 
-                        (String(s.kodeKasir).toLowerCase() === 'admin' || String(s.kodeKasir).toLowerCase().includes('admin'))
-                    );
-                    if (adminUser) isValid = true;
-                } else {
-                    if (pin === '123') isValid = true; 
-                }
-
-                if (isValid) {
-                    onConfirm();
-                } else {
-                    showAlert('PIN salah! Akses ditolak.', 'error');
-                    setPin('');
+                try {
+                    const response = await fetch(GAS_URL, { 
+                        method: 'POST', 
+                        redirect: 'follow',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                        body: JSON.stringify({ action: 'VERIFY_ADMIN_PIN', pin: pin }) 
+                    });
+                    const res = await response.json();
+                    
+                    if (res.status === 'success' && res.valid) {
+                        onConfirm();
+                    } else {
+                        showAlert('PIN Admin salah! Akses ditolak.', 'error');
+                        setPin('');
+                    }
+                } catch (err) {
+                    showAlert('Gagal koneksi untuk verifikasi PIN.', 'error');
+                } finally {
+                    setLoading(false);
                 }
             };
 
@@ -171,15 +176,18 @@
                                     type="password" 
                                     inputMode="numeric"
                                     autoFocus
-                                    placeholder="••••••" 
+                                    disabled={loading}
+                                    placeholder={loading ? "..." : "••••••"} 
                                     value={pin} 
                                     onChange={e => setPin(e.target.value)}
                                     className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none text-center text-2xl tracking-[0.5em] font-black text-gray-800 transition-all bg-gray-50/50"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-3 pt-2">
-                                <button type="button" onClick={onClose} className="py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 transition-all text-sm">Batal</button>
-                                <button type="submit" className="py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-blue-200 text-sm">Konfirmasi</button>
+                                <button type="button" disabled={loading} onClick={onClose} className="py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 transition-all text-sm">Batal</button>
+                                <button type="submit" disabled={loading} className="py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-blue-200 text-sm">
+                                    {loading ? 'Mengecek...' : 'Konfirmasi'}
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -202,8 +210,6 @@
             const [settings, setSettings] = useState(INITIAL_SETTINGS);
             const [products, setProducts] = useState(INITIAL_PRODUCTS);
             const [transactions, setTransactions] = useState([]);
-            
-            const [staffList, setStaffList] = useState([]);
 
             const [loginError, setLoginError] = useState('');
             const [editingTrx, setEditingTrx] = useState(null);
@@ -267,6 +273,7 @@
                     
                     const response = await fetch(GAS_URL, { 
                         method: 'POST', 
+                        redirect: 'follow',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                         body: JSON.stringify(payload) 
                     });
@@ -284,9 +291,6 @@
                     try {
                         const res = await fetchFromGAS({ action: 'GET_DATA' });
                         if (isMounted && res.status === 'success') {
-                            if (res.data.staff && Array.isArray(res.data.staff)) {
-                                setStaffList(res.data.staff);
-                            }
                             if (res.data.settings && Object.keys(res.data.settings).length > 0) {
                                 setSettings({ ...INITIAL_SETTINGS, ...res.data.settings });
                             }
@@ -317,31 +321,18 @@
                 const inputUser = e.target.username.value;
                 const inputPass = e.target.password.value;
                 
-                setLoginError('Loading masuk aplikasi...');
+                setLoginError('Memverifikasi akun...');
                 setIsDbLoading(true);
-                const res = await fetchFromGAS({ action: 'GET_DATA' });
-                setIsDbLoading(false);
-
-                if (res.status === 'success') {
-                    const staffData = res.data.staff || [];
-                    setStaffList(staffData); 
+                
+                const loginRes = await fetchFromGAS({ action: 'VERIFY_LOGIN', username: inputUser, password: inputPass });
+                
+                if (loginRes.status === 'success') {
+                    const validUser = loginRes.user;
+                    setCurrentUser(validUser);
+                    localStorage.setItem('kassqu_user', JSON.stringify(validUser));
                     
-                    let validUser = staffData.find(s => {
-                        const dbUser = String(s.kodeKasir || s['Kode Kasir'] || '').trim();
-                        const dbPin = String(s.pin || s['PIN'] || s.PIN || '').trim();
-                        const dbStatus = String(s.status || s['Status'] || s.Status || '').trim().toLowerCase();
-                        
-                        return dbUser === inputUser && dbPin === inputPass && dbStatus === 'aktif';
-                    });
-
-                    if (!validUser && inputUser === 'admin' && inputPass === '123') {
-                        validUser = { kodeKasir: 'admin', namaKasir: 'Admin Utama', status: 'aktif' };
-                    }
-
-                    if (validUser) {
-                        setCurrentUser(validUser);
-                        localStorage.setItem('kassqu_user', JSON.stringify(validUser));
-                        
+                    const res = await fetchFromGAS({ action: 'GET_DATA' });
+                    if (res.status === 'success') {
                         if (res.data.settings && Object.keys(res.data.settings).length > 0) {
                             setSettings({ ...INITIAL_SETTINGS, ...res.data.settings });
                         }
@@ -351,14 +342,13 @@
                         if (res.data.transactions && Array.isArray(res.data.transactions)) {
                             setTransactions(res.data.transactions);
                         }
-                        setIsLoggedIn(true); 
-                        setLoginError('');
-                    } else {
-                        setLoginError('Username/Password salah, atau akun nonaktif!');
                     }
+                    setIsLoggedIn(true); 
+                    setLoginError('');
                 } else {
-                    setLoginError(res.message || 'Gagal koneksi ke server database.');
+                    setLoginError(loginRes.message || 'Gagal masuk aplikasi.');
                 }
+                setIsDbLoading(false);
             };
 
             const requestAuth = (actionCallback) => {
@@ -502,7 +492,6 @@
 
                     {showAuthModal && (
                         <AdminAuthModal 
-                            staffList={staffList}
                             showAlert={showAlert}
                             onClose={() => {
                                 setShowAuthModal(false);
@@ -1149,9 +1138,9 @@
                                     </select>
                                 )}
                             </td>
-                            <td className="p-3 print:hidden flex gap-2">
-                                <button onClick={()=>setReceiptData(t)} className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors border shadow-sm"><Icon name="Receipt" size={12}/> Struk</button>
-                                {t.status==='Belum Lunas' && <button onClick={()=>onLoadToKasir(t)} className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors border shadow-sm"><Icon name="Wallet" size={12}/> Bayar</button>}
+                            <td className="p-3 print:hidden flex flex-col gap-2">
+                                <button onClick={()=>setReceiptData(t)} className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors border shadow-sm w-full"><Icon name="Receipt" size={12}/> Struk</button>
+                                {t.status==='Belum Lunas' && <button onClick={()=>onLoadToKasir(t)} className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors border shadow-sm w-full"><Icon name="Wallet" size={12}/> Bayar</button>}
                             </td>
                         </tr>
                         ))}
