@@ -21,13 +21,11 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Apple/iOS Dark Mode Fix untuk Input Tanggal */
         input[type="date"] {
             color: #1f2937 !important;
             -webkit-text-fill-color: #1f2937 !important;
             color-scheme: light !important;
         }
-        /* Tembak langsung ke shadow DOM kalender Apple */
         input[type="date"]::-webkit-datetime-edit,
         input[type="date"]::-webkit-datetime-edit-text, 
         input[type="date"]::-webkit-datetime-edit-month-field, 
@@ -44,18 +42,12 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // ==========================================
-        // 🔴 KONFIGURASI PENTING DEVELOPER 🔴
-        // ==========================================
         const DEV_COMPANY_LOGO = ""; 
         const SPLASH_BG_IMAGE = "https://static.vecteezy.com/system/resources/thumbnails/038/813/435/small/ai-generated-beautifulgraphy-for-laundry-advertising-free-photo.jpeg"; 
         const LOGIN_BG_IMAGE = "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI0LTAzL2FuZ3VzdGVvd19waG90b19vZl9jbG90aGVzX3dhc2hpbmdfbWFjaGluZV9pbl9taW5pbWFsX2xhdW5kcnlfYl8wYTg4MjY5ZC04NTRhLTQ5ODUtYTQ4ZC1lNGUzZDdmYzMyMDJfMS5qcGc.jpg"; 
 
-        // PASTE URL WEB APP GOOGLE APPS SCRIPT LU DI SINI:
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxR1PppWpHWrvku-14G-vfYUAvTy13S8N69iZfjNfAhZKs2SHU3d6uQNjEJKm7aWlI/exec"; 
-        // ==========================================
 
-        // --- UTUTLITAS FORMATTER UNTUK INPUT ---
         const formatThousand = (val) => {
             if (val === undefined || val === null || val === '') return '';
             const num = val.toString().replace(/[^0-9]/g, '');
@@ -67,7 +59,6 @@
             return Number(val.toString().replace(/[^0-9]/g, ''));
         };
 
-        // --- SISTEM ICON INTERNAL ---
         const icons = {
             Home: <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>,
             Package: <><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
@@ -102,7 +93,6 @@
             </svg>
         );
 
-        // --- DATA DEFAULT ---
         const INITIAL_SETTINGS = {
             storeName: 'Toko Lek Heru',
             address: 'Jl. Merdeka No. 123',
@@ -140,7 +130,6 @@
             });
         };
 
-        // --- KOMPONEN OTORISASI PIN ADMIN ---
         function AdminAuthModal({ onClose, onConfirm, staffList, showAlert }) {
             const [pin, setPin] = useState('');
             
@@ -149,14 +138,12 @@
                 let isValid = false;
                 
                 if (staffList && staffList.length > 0) {
-                    // Cari apakah PIN ini cocok dengan akun yang kode kasirnya mengandung kata "admin"
                     const adminUser = staffList.find(s => 
                         String(s.pin) === pin && 
                         (String(s.kodeKasir).toLowerCase() === 'admin' || String(s.kodeKasir).toLowerCase().includes('admin'))
                     );
                     if (adminUser) isValid = true;
                 } else {
-                    // Fallback sementara jika database kosong (hanya untuk testing awal)
                     if (pin === '123') isValid = true; 
                 }
 
@@ -200,7 +187,6 @@
             );
         }
 
-        // --- KOMPONEN UTAMA ---
         function App() {
             const [showSplash, setShowSplash] = useState(true);
             const [isDbLoading, setIsDbLoading] = useState(false);
@@ -217,19 +203,14 @@
             const [products, setProducts] = useState(INITIAL_PRODUCTS);
             const [transactions, setTransactions] = useState([]);
             
-            // State untuk menyimpan daftar staff dari database untuk validasi PIN Admin
             const [staffList, setStaffList] = useState([]);
 
             const [loginError, setLoginError] = useState('');
             const [editingTrx, setEditingTrx] = useState(null);
 
-            // State Modal Otorisasi
             const [showAuthModal, setShowAuthModal] = useState(false);
             const [pendingAuthAction, setPendingAuthAction] = useState(null);
 
-            // ========================================================
-            // 🚀 FITUR KUNCI SCROLL (ANTI-BOUNCE iOS PWA) SAAT SPLASH & LOGIN
-            // ========================================================
             const isAppLocked = showSplash || !isLoggedIn;
 
             useEffect(() => {
@@ -267,9 +248,7 @@
                     document.removeEventListener('touchmove', preventBouncing);
                 };
             }, [isAppLocked]);
-            // ========================================================
 
-            // State Notifikasi Box Custom
             const [appAlert, setAppAlert] = useState(null); 
             const showAlert = (message, type = 'error') => {
                 setAppAlert({ message, type });
@@ -305,7 +284,6 @@
                     try {
                         const res = await fetchFromGAS({ action: 'GET_DATA' });
                         if (isMounted && res.status === 'success') {
-                            // Simpan daftar staff ke memory agar otorisasi jalan cepat
                             if (res.data.staff && Array.isArray(res.data.staff)) {
                                 setStaffList(res.data.staff);
                             }
@@ -346,7 +324,7 @@
 
                 if (res.status === 'success') {
                     const staffData = res.data.staff || [];
-                    setStaffList(staffData); // Simpan daftar staff pas login
+                    setStaffList(staffData); 
                     
                     let validUser = staffData.find(s => {
                         const dbUser = String(s.kodeKasir || s['Kode Kasir'] || '').trim();
@@ -383,14 +361,11 @@
                 }
             };
 
-            // FUNGSI GATEKEEPER UNTUK MINTA IZIN ADMIN
             const requestAuth = (actionCallback) => {
                 const currentKode = String(currentUser?.kodeKasir || '').toLowerCase();
-                // Jika user yang sedang login sudah admin, maka langsung lolos (bypass)
                 if (currentKode === 'admin' || currentKode.includes('admin')) {
                     actionCallback();
                 } else {
-                    // Tahan action-nya, tampilkan modal PIN
                     setPendingAuthAction(() => actionCallback);
                     setShowAuthModal(true);
                 }
@@ -501,18 +476,15 @@
 
                     <nav className="fixed bottom-[calc(6px+env(safe-area-inset-bottom,0px))] left-4 right-4 max-w-xl mx-auto bg-white border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex justify-around items-center h-16 z-30 px-2 sm:px-6 rounded-2xl print:hidden animate-in slide-in-from-bottom-5">
                         <NavItem icon={<Icon name="Home" size={24} />} label="Dashboard" isActive={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-                        {/* 🔴 Menu Produk Dilindungi PIN */}
                         <NavItem icon={<Icon name="Package" size={24} />} label="Produk" isActive={activeTab === 'produk'} onClick={() => requestAuth(() => setActiveTab('produk'))} />
                         <div className="-mt-6 relative flex flex-col items-center">
                             <button onClick={() => setActiveTab('kasir')} className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg text-white transition-transform hover:scale-105 active:scale-95 ${activeTab === 'kasir' ? 'bg-blue-700 ring-4 ring-blue-100' : 'bg-blue-500'}`}><Icon name="ShoppingCart" size={28} /></button>
                             <span className={`text-[10px] font-bold mt-1 ${activeTab === 'kasir' ? 'text-blue-700' : 'text-gray-500'}`}>KASIR</span>
                         </div>
                         <NavItem icon={<Icon name="FileText" size={24} />} label="Laporan" isActive={activeTab === 'laporan'} onClick={() => setActiveTab('laporan')} />
-                        {/* 🔴 Menu Setup Dilindungi PIN */}
                         <NavItem icon={<Icon name="Settings" size={24} />} label="Setup" isActive={activeTab === 'setup'} onClick={() => requestAuth(() => setActiveTab('setup'))} />
                     </nav>
 
-                    {/* MODAL GLOBAL ALERT */}
                     {appAlert && (
                         <div className="fixed inset-0 bg-black/60 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200">
                             <div className="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl animate-in zoom-in-95 duration-200 text-center border border-gray-100">
@@ -528,7 +500,6 @@
                         </div>
                     )}
 
-                    {/* MODAL OTORISASI ADMIN (PIN) */}
                     {showAuthModal && (
                         <AdminAuthModal 
                             staffList={staffList}
@@ -606,7 +577,6 @@
                                         <button onClick={() => { setIsEditing(false); setInputModal(formatThousand(settings?.modalLaci || 0)); }} className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-bold">Batal</button>
                                     </div>
                                 ) : (
-                                    // 🔴 Tombol Atur Modal Awal dilindungi PIN
                                     <button onClick={() => requestAuth(() => setIsEditing(true))} className="w-full sm:w-auto bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition-colors"><Icon name="Edit" size={12}/> Atur Modal Awal</button>
                                 )}
                             </div>
@@ -643,17 +613,13 @@
             );
         }
 
-        // ==========================================
-        // FITUR BARU: MANAJEMEN PRODUK & KATEGORI
-        // ==========================================
         function ProdukView({ products, onSaveProduct, onDeleteProduct, formatRupiah, searchQuery, compressImage, settings, onSaveSettings, showAlert }) {
             const [isModalOpen, setIsModalOpen] = useState(false);
-            const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false); // Modal state untuk kategori
+            const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false); 
             const [editingProduct, setEditingProduct] = useState(null);
             
-            const [newCategory, setNewCategory] = useState(''); // Inputan kategori baru
+            const [newCategory, setNewCategory] = useState(''); 
             
-            // Siapkan list kategori (fallback jika kosong)
             const catList = settings?.categories && settings.categories.length > 0 ? settings.categories : ['Umum'];
 
             const [name, setName] = useState(''); 
@@ -681,7 +647,6 @@
                 setIsModalOpen(false); 
             };
 
-            // Fungsi Tambah Kategori
             const handleAddCategory = () => {
                 const trimmed = newCategory.trim();
                 if (!trimmed) return;
@@ -698,13 +663,11 @@
                 showAlert('Kategori baru berhasil ditambahkan!', 'success');
             };
 
-            // Fungsi Hapus Kategori
             const handleDeleteCategory = (catToDelete) => {
                 const currentCats = settings?.categories || [];
                 const updatedCats = currentCats.filter(c => c !== catToDelete);
                 onSaveSettings({ ...settings, categories: updatedCats });
                 
-                // Pastikan jika kategori yg dihapus lagi terpilih di form, ganti ke yg lain
                 if (category === catToDelete && updatedCats.length > 0) {
                     setCategory(updatedCats[0]);
                 }
@@ -713,7 +676,6 @@
             return (
                 <>
                     <div className="space-y-4 animate-in fade-in duration-500">
-                        {/* HEADER BUTTONS: Kategori & Tambah Produk */}
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Layanan</h2>
                             <div className="flex items-center gap-2">
@@ -736,7 +698,6 @@
                         </div>
                     </div>
 
-                    {/* MODAL TAMBAH/EDIT PRODUK */}
                     {isModalOpen && (
                         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
                             <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
@@ -755,7 +716,6 @@
                                         <div>
                                             <label className="block text-sm font-medium mb-1">Kategori</label>
                                             <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                                                {/* DATA KATEGORI SEKARANG DI-RENDER DINAMIS DARI DATABASE */}
                                                 {catList.map((cat, idx) => (
                                                     <option key={idx} value={cat}>{cat}</option>
                                                 ))}
@@ -769,7 +729,6 @@
                         </div>
                     )}
 
-                    {/* MODAL MANAJEMEN KATEGORI CUSTOM */}
                     {isCategoryModalOpen && (
                         <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
                             <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
@@ -919,7 +878,7 @@
                     date: trxId && editingTrx ? editingTrx.date : new Date().toISOString(), 
                     pickupDate: pickupDate,
                     queueNumber: queueNumber,
-                    progressStatus: trxId && editingTrx && editingTrx.progressStatus ? editingTrx.progressStatus : 'Baru Masuk',
+                    progressStatus: 'Diambil',
                     paymentMethod: method,        
                     amountReceived: amountReceived, 
                     change: change                
@@ -1058,7 +1017,6 @@
             
             const labaBersih = totalOmset - totalModal;
 
-            // Fitur Export ke Excel (CSV)
             const exportToExcel = () => {
                 const headers = ['ID Transaksi', 'No Antrian', 'Tanggal Masuk', 'Jadwal Ambil', 'Nama Pelanggan', 'Layanan Dibeli', 'Total Belanja (Rp)', 'Status Bayar', 'Metode Bayar', 'Status Proses'];
                 const csvRows = [headers.join(';')];
@@ -1076,12 +1034,11 @@
                     const progress = t.progressStatus || '-';
 
                     const row = [id, queue, date, pickup, customer, items, total, status, method, progress]
-                        .map(field => `"${String(field).replace(/"/g, '""')}"`) // Escape format text biar rapi di excel
+                        .map(field => `"${String(field).replace(/"/g, '""')}"`) 
                         .join(';');
                     csvRows.push(row);
                 });
 
-                // Tambahkan BOM (\uFEFF) agar terbaca sempurna di Microsoft Excel
                 const csvString = "\uFEFF" + csvRows.join('\n');
                 const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement("a");
@@ -1137,7 +1094,6 @@
                         )}
                     </div>
                     
-                    {/* RESPONSIVE & AUTO-SHRINK BOXES */}
                     <div className="grid grid-cols-3 gap-1.5 sm:gap-4 print:hidden mb-4">
                         <div className="bg-white border rounded-xl p-2 sm:p-4 shadow-sm text-center flex flex-col justify-center min-w-0">
                             <p className="text-[9px] sm:text-xs text-gray-500 font-bold uppercase mb-1 truncate">Total Omset</p>
@@ -1175,16 +1131,23 @@
                                 </div>
                             </td>
                             <td className="p-3 text-center print:hidden">
-                                <select 
-                                    value={t.progressStatus || 'Baru Masuk'} 
-                                    onChange={(e) => onUpdateTransaction({ ...t, progressStatus: e.target.value })}
-                                    className={`text-[10px] font-bold border rounded p-1 outline-none cursor-pointer ${t.progressStatus === 'Selesai' || t.progressStatus === 'Diambil' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
-                                >
-                                    <option value="Baru Masuk">Baru Masuk</option>
-                                    <option value="Proses Cuci">Proses Pengerjaan</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Diambil">Diambil</option>
-                                </select>
+                                {t.status === 'Lunas' ? (
+                                    <span className="inline-block px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded text-[10px] font-bold shadow-sm">
+                                        Diambil
+                                    </span>
+                                ) : (
+                                    <select 
+                                        value={t.progressStatus || 'Baru Masuk'} 
+                                        onChange={(e) => onUpdateTransaction({ ...t, progressStatus: e.target.value })}
+                                        className={`text-[10px] font-bold border rounded p-1 outline-none cursor-pointer ${t.progressStatus === 'Selesai' || t.progressStatus === 'Diambil' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}
+                                    >
+                                        <option value="Baru Masuk">Baru Masuk</option>
+                                        <option value="Proses Cuci">Proses Cuci</option>
+                                        <option value="Proses Setrika">Proses Setrika</option>
+                                        <option value="Selesai">Selesai</option>
+                                        <option value="Diambil">Diambil</option>
+                                    </select>
+                                )}
                             </td>
                             <td className="p-3 print:hidden flex gap-2">
                                 <button onClick={()=>setReceiptData(t)} className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors border shadow-sm"><Icon name="Receipt" size={12}/> Struk</button>
@@ -1195,7 +1158,6 @@
                     </tbody></table></div>
                     <div className="hidden print:block text-right font-bold text-lg p-2 mt-4">Total Lunas: {formatRupiah(totalOmset)} <br/> Laba Bersih: {formatRupiah(labaBersih)}</div>
                     
-                    {/* Modal Struk Laporan */}
                     {receiptData && <ReceiptModal data={receiptData} settings={settings} onClose={()=>setReceiptData(null)} formatRupiah={formatRupiah} showAlert={showAlert} />}
                 </div>
             );
